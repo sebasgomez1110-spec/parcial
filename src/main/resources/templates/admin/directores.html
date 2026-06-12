@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Saber Pro UTS')}">
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Gestión de Directores | Saber Pro</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet"/>
+    <link th:href="@{/css/saberpro.css}" rel="stylesheet"/>
+</head>
+<body class="sp-body">
+<div th:replace="~{fragments/layout :: sidebar}"></div>
+<div class="sp-main">
+<div th:replace="~{fragments/layout :: topbar}"></div>
+<main class="sp-content">
+
+    <div class="sp-page-header">
+        <div>
+            <h1 class="sp-page-title font-display"><i class="bi bi-person-badge-fill me-2"></i>Gestión de Directores</h1>
+            <p class="sp-page-subtitle">Administración de directores de facultad</p>
+        </div>
+        <button class="btn sp-btn-primary" data-bs-toggle="modal" data-bs-target="#modalDirector"
+                onclick="limpiarFormulario()">
+            <i class="bi bi-plus-circle-fill me-2"></i>Nuevo Director
+        </button>
+    </div>
+
+    <div th:if="${mensaje}" class="alert sp-alert"
+         th:classappend="'alert-' + ${tipoMensaje}" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i>
+        <span th:text="${mensaje}"></span>
+        <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
+    </div>
+
+    <!-- Buscador -->
+    <div class="sp-card mb-4">
+        <div class="sp-card-body py-3">
+            <div class="input-group sp-input-group" style="max-width:360px">
+                <span class="input-group-text sp-input-icon"><i class="bi bi-search"></i></span>
+                <input type="text" id="tableSearch" class="form-control sp-form-control"
+                       placeholder="Buscar director..."/>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla -->
+    <div class="sp-card">
+        <div class="sp-card-header">
+            <h5><i class="bi bi-table me-2"></i>Lista de Directores</h5>
+            <span class="badge sp-badge-count"
+                  th:text="${#lists.size(directores)} + ' registros'">0 registros</span>
+        </div>
+        <div class="sp-card-body p-0">
+            <div class="table-responsive">
+                <table class="table sp-table sp-searchable mb-0">
+                    <thead>
+                        <tr>
+                            <th>Nombre Completo</th>
+                            <th>Cédula</th>
+                            <th>Email</th>
+                            <th>Teléfono</th>
+                            <th>Estado</th>
+                            <th class="text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="d : ${directores}">
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="sp-avatar sp-avatar-sm"
+                                         style="background:rgba(10,36,99,0.08);color:var(--sp-navy)">
+                                        <i class="bi bi-person-badge-fill"></i>
+                                    </div>
+                                    <span th:text="${d.nombreCompleto}">Nombre</span>
+                                </div>
+                            </td>
+                            <td th:text="${d.cedula}">-</td>
+                            <td th:text="${d.email}">-</td>
+                            <td th:text="${d.telefono != null ? d.telefono : '—'}">-</td>
+                            <td>
+                                <span th:if="${d.activo}"
+                                      class="badge" style="background:rgba(64,145,108,0.12);color:#40916c">Activo</span>
+                                <span th:unless="${d.activo}" class="badge bg-secondary">Inactivo</span>
+                            </td>
+                            <td class="text-center">
+                                <div class="sp-action-btns">
+                                    <a th:href="@{/admin/directores/editar/{id}(id=${d.id})}"
+                                       class="btn sp-btn-icon sp-btn-edit" title="Editar"
+                                       data-bs-toggle="tooltip">
+                                        <i class="bi bi-pencil-fill"></i>
+                                    </a>
+                                    <a th:href="@{/admin/directores/eliminar/{id}(id=${d.id})}"
+                                       class="btn sp-btn-icon sp-btn-delete" title="Eliminar"
+                                       data-confirm="¿Eliminar este director?">
+                                        <i class="bi bi-trash-fill"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(directores)}">
+                            <td colspan="6">
+                                <div class="sp-empty-state" style="padding:40px">
+                                    <i class="bi bi-inbox"></i>
+                                    <p>No hay directores registrados.<br/>Haz clic en <strong>Nuevo Director</strong> para comenzar.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL -->
+    <div class="modal fade" id="modalDirector" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content sp-modal">
+                <div class="modal-header sp-modal-header">
+                    <h5 class="modal-title">
+                        <i class="bi bi-person-badge-fill me-2"></i>
+                        <span th:text="${director.id != null ? 'Editar Director' : 'Nuevo Director'}">Formulario</span>
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form th:action="@{/admin/directores/guardar}" th:object="${director}" method="post">
+                        <input type="hidden" th:field="*{id}"/>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="sp-form-label">Nombre *</label>
+                                <input type="text" th:field="*{nombre}" class="form-control sp-form-control"
+                                       placeholder="Nombre" required/>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="sp-form-label">Apellido *</label>
+                                <input type="text" th:field="*{apellido}" class="form-control sp-form-control"
+                                       placeholder="Apellido" required/>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="sp-form-label">Cédula *</label>
+                                <input type="text" th:field="*{cedula}" class="form-control sp-form-control"
+                                       placeholder="Número de cédula" required/>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="sp-form-label">Teléfono</label>
+                                <input type="text" th:field="*{telefono}" class="form-control sp-form-control"
+                                       placeholder="Teléfono de contacto"/>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="sp-form-label">Email *</label>
+                                <input type="email" th:field="*{email}" class="form-control sp-form-control"
+                                       placeholder="correo@institucion.edu.co" required/>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="sp-form-label">
+                                    Contraseña
+                                    <span class="text-muted fw-normal" th:if="${director.id != null}">
+                                        (dejar vacío para mantener)
+                                    </span>
+                                </label>
+                                <input type="password" th:field="*{password}" class="form-control sp-form-control"
+                                       placeholder="••••••••"/>
+                            </div>
+                        </div>
+                        <div class="d-flex gap-2 justify-content-end mt-4 pt-2 border-top">
+                            <button type="button" class="btn sp-btn-outline" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn sp-btn-primary">
+                                <i class="bi bi-save-fill me-2"></i>Guardar Director
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        if (/*[[${director.id}]]*/ null) {
+            new bootstrap.Modal(document.getElementById('modalDirector')).show();
+        }
+    </script>
+
+</main>
+</div>
+
+
+<div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>

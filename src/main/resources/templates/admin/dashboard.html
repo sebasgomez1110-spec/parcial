@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Dashboard — Administrador')}"></head>
+<body class="sp-body">
+<div th:replace="~{fragments/layout :: sidebar}"></div>
+<div class="sp-main">
+<div th:replace="~{fragments/layout :: topbar}"></div>
+<main class="sp-content">
+
+    <div class="sp-page-header">
+        <div>
+            <div class="sp-page-eyebrow"><i class="bi bi-shield-fill-check me-1"></i> Administración</div>
+            <h1 class="sp-page-title font-display">Panel de Control</h1>
+            <p class="sp-page-subtitle">Gestión institucional del sistema Saber Pro — UTS Bucaramanga</p>
+        </div>
+        <div class="sp-role-badge-header"><i class="bi bi-shield-fill-check"></i> Administrador</div>
+    </div>
+
+    <!-- MÉTRICAS -->
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-lg-3">
+            <div class="sp-metric-card sp-metric-blue">
+                <div class="sp-metric-icon"><i class="bi bi-person-badge-fill"></i></div>
+                <div>
+                    <div class="sp-metric-val" th:text="${totalDocentes}">0</div>
+                    <div class="sp-metric-lbl">Docentes registrados</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="sp-metric-card sp-metric-teal">
+                <div class="sp-metric-icon"><i class="bi bi-diagram-3-fill"></i></div>
+                <div>
+                    <div class="sp-metric-val" th:text="${totalCoordinaciones}">0</div>
+                    <div class="sp-metric-lbl">Coordinaciones</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="sp-metric-card sp-metric-warn">
+                <div class="sp-metric-icon"><i class="bi bi-building-fill"></i></div>
+                <div>
+                    <div class="sp-metric-val" th:text="${totalFacultades}">0</div>
+                    <div class="sp-metric-lbl">Facultades activas</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="sp-metric-card sp-metric-purple">
+                <div class="sp-metric-icon"><i class="bi bi-file-earmark-text-fill"></i></div>
+                <div>
+                    <div class="sp-metric-val" th:text="${totalResoluciones}">0</div>
+                    <div class="sp-metric-lbl">Resoluciones vigentes</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ACCESOS RÁPIDOS -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-6 col-xl-3">
+            <a th:href="@{/admin/directores}" class="sp-action-card sp-ac-teal">
+                <i class="bi bi-person-workspace sp-ac-icon"></i>
+                <div class="sp-ac-title">Directores</div>
+                <div class="sp-ac-desc">Crear, editar y eliminar directores de carrera</div>
+                <i class="bi bi-arrow-up-right sp-ac-arrow"></i>
+            </a>
+        </div>
+        <div class="col-md-6 col-xl-3">
+            <a th:href="@{/admin/docentes}" class="sp-action-card sp-ac-blue">
+                <i class="bi bi-people-fill sp-ac-icon"></i>
+                <div class="sp-ac-title">Docentes</div>
+                <div class="sp-ac-desc">Gestionar el personal docente del programa</div>
+                <i class="bi bi-arrow-up-right sp-ac-arrow"></i>
+            </a>
+        </div>
+        <div class="col-md-6 col-xl-3">
+            <a th:href="@{/admin/facultades}" class="sp-action-card sp-ac-warn">
+                <i class="bi bi-building-fill sp-ac-icon"></i>
+                <div class="sp-ac-title">Facultades</div>
+                <div class="sp-ac-desc">Administrar los 29 programas académicos</div>
+                <i class="bi bi-arrow-up-right sp-ac-arrow"></i>
+            </a>
+        </div>
+        <div class="col-md-6 col-xl-3">
+            <a th:href="@{/admin/resoluciones}" class="sp-action-card sp-ac-purple">
+                <i class="bi bi-file-earmark-text-fill sp-ac-icon"></i>
+                <div class="sp-ac-title">Resoluciones</div>
+                <div class="sp-ac-desc">Beneficios Tecnología e Ingeniería</div>
+                <i class="bi bi-arrow-up-right sp-ac-arrow"></i>
+            </a>
+        </div>
+    </div>
+
+    <!-- TABLAS RESUMEN -->
+    <div class="row g-4">
+        <div class="col-md-6">
+            <div class="sp-card h-100">
+                <div class="sp-card-header">
+                    <span><i class="bi bi-building-fill me-2" style="color:var(--c-warn)"></i>Facultades registradas</span>
+                    <a th:href="@{/admin/facultades}" class="sp-btn-outline btn-sm">Gestionar</a>
+                </div>
+                <div class="p-0">
+                    <table class="table sp-table mb-0">
+                        <thead><tr><th>Carrera</th><th>Código</th><th>Estado</th></tr></thead>
+                        <tbody>
+                            <tr th:each="f : ${facultades}">
+                                <td style="font-size:13px" th:text="${f.nombre}">-</td>
+                                <td><span class="sp-badge sp-badge-orange" th:text="${f.codigo}">-</span></td>
+                                <td>
+                                    <span class="sp-badge" th:classappend="${f.activa ? 'sp-badge-ok' : 'sp-badge-danger'}" th:text="${f.activa ? 'Activa' : 'Inactiva'}">-</span>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(facultades)}">
+                                <td colspan="3"><div class="sp-empty-state"><i class="bi bi-building"></i><p>Sin carreras registradas</p></div></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="sp-card h-100">
+                <div class="sp-card-header">
+                    <span><i class="bi bi-file-earmark-text-fill me-2" style="color:var(--c-purple)"></i>Resoluciones de beneficios</span>
+                    <a th:href="@{/admin/resoluciones}" class="sp-btn-outline btn-sm">Gestionar</a>
+                </div>
+                <div class="p-0">
+                    <table class="table sp-table mb-0">
+                        <thead><tr><th>N° Resolución</th><th>Área</th><th>Descuento</th><th>Estado</th></tr></thead>
+                        <tbody>
+                            <tr th:each="r : ${resoluciones}">
+                                <td style="font-size:12px;font-weight:600" th:text="${r.numeroResolucion}">-</td>
+                                <td>
+                                    <span class="sp-badge"
+                                          th:classappend="${r.area == 'TECNOLOGIA' ? 'sp-badge-info' : r.area == 'INGENIERIA' ? 'sp-badge-warn' : 'sp-badge-orange'}"
+                                          th:text="${r.area}">-</span>
+                                </td>
+                                <td style="font-weight:700;color:var(--c-accent)" th:text="${r.porcentajeDescuento}">-</td>
+                                <td><span class="sp-badge" th:classappend="${r.vigente ? 'sp-badge-ok' : 'sp-badge-danger'}" th:text="${r.vigente ? 'Vigente' : 'Vencida'}">-</span></td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(resoluciones)}">
+                                <td colspan="4"><div class="sp-empty-state"><i class="bi bi-file-earmark-x"></i><p>Sin resoluciones</p></div></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</main>
+</div>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>

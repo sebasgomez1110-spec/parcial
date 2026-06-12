@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Informe de Alumnos')}"></head>
+<body class="sp-body">
+<div th:replace="~{fragments/layout :: sidebar}"></div>
+<div class="sp-main">
+<div th:replace="~{fragments/layout :: topbar}"></div>
+<main class="sp-content">
+
+    <div class="sp-page-header">
+        <div>
+            <h1 class="sp-page-title font-display"><i class="bi bi-bar-chart-fill me-2"></i>Informe de Alumnos</h1>
+            <p class="sp-page-subtitle">Resultados Total y Único — Filtros y exportación</p>
+        </div>
+        <!-- RF-14/18: Botones de exportación -->
+        <div class="d-flex gap-2 flex-wrap" id="exportBtns">
+            <a th:href="@{/export/alumnos/print(tipo=${tipo},facultadId=${param.facultadId},estado=${param.estado})}"
+               target="_blank" class="btn sp-btn-outline btn-sm">
+                <i class="bi bi-printer-fill me-1"></i>PDF / Imprimir
+            </a>
+            <a th:href="@{/export/alumnos/excel(tipo=${tipo},facultadId=${param.facultadId},estado=${param.estado})}"
+               class="btn sp-btn-primary btn-sm">
+                <i class="bi bi-file-earmark-excel-fill me-1"></i>Descargar Excel
+            </a>
+        </div>
+    </div>
+
+    <!-- RF-12/13: Pestañas Total / Único -->
+    <div class="d-flex gap-2 mb-4 flex-wrap">
+        <a th:href="@{/coordinacion/informe/alumnos(tipo='TOTAL',facultadId=${param.facultadId},estado=${param.estado})}"
+           class="btn" th:classappend="${tipo == 'TOTAL' ? ' sp-btn-primary' : ' sp-btn-outline'}">
+            <i class="bi bi-people-fill me-1"></i>Resultado Total
+        </a>
+        <a th:href="@{/coordinacion/informe/alumnos(tipo='UNICO',facultadId=${param.facultadId},estado=${param.estado})}"
+           class="btn" th:classappend="${tipo == 'UNICO' ? ' sp-btn-primary' : ' sp-btn-outline'}">
+            <i class="bi bi-person-fill me-1"></i>Resultado Único
+        </a>
+    </div>
+
+    <!-- RF-17/39: Filtros de búsqueda -->
+    <div class="sp-card mb-4">
+        <div class="sp-card-body py-3">
+            <form th:action="@{/coordinacion/informe/alumnos}" method="get" class="row g-2 align-items-end">
+                <input type="hidden" name="tipo" th:value="${tipo}"/>
+                <div class="col-md-3">
+                    <label class="sp-form-label">Buscar</label>
+                    <div class="input-group sp-input-group">
+                        <span class="input-group-text sp-input-icon"><i class="bi bi-search"></i></span>
+                        <input type="text" id="tableSearch" class="form-control sp-form-control"
+                               placeholder="Nombre, cédula o código..."/>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <label class="sp-form-label">Facultad</label>
+                    <select name="facultadId" class="form-select sp-form-control" onchange="this.form.submit()">
+                        <option value="">— Todas las facultades —</option>
+                        <option th:each="f : ${facultades}" th:value="${f.id}" th:text="${f.nombre}"
+                                th:selected="${param.facultadId != null and param.facultadId[0] == f.id}">Fac</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="sp-form-label">Estado SP</label>
+                    <select name="estado" class="form-select sp-form-control" onchange="this.form.submit()">
+                        <option value="">— Todos —</option>
+                        <option value="APROBADO"   th:selected="${param.estado != null and param.estado[0] == 'APROBADO'}">Aprobado</option>
+                        <option value="PENDIENTE"  th:selected="${param.estado != null and param.estado[0] == 'PENDIENTE'}">Pendiente</option>
+                        <option value="RECHAZADO"  th:selected="${param.estado != null and param.estado[0] == 'RECHAZADO'}">Rechazado</option>
+                        <option value="PAGADO"     th:selected="${param.estado != null and param.estado[0] == 'PAGADO'}">Pagado</option>
+                        <option value="PRESENTADO" th:selected="${param.estado != null and param.estado[0] == 'PRESENTADO'}">Presentado</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="sp-form-label">&nbsp;</label>
+                    <a th:href="@{/coordinacion/informe/alumnos(tipo=${tipo})}" class="btn sp-btn-outline w-100">
+                        <i class="bi bi-x-circle me-1"></i>Limpiar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Métricas -->
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+            <div class="sp-metric-card sp-metric-green">
+                <div class="sp-metric-icon"><i class="bi bi-people-fill"></i></div>
+                <div><div class="sp-metric-val" th:text="${totalAlumnos}">0</div><div class="sp-metric-lbl">Total</div></div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="sp-metric-card sp-metric-blue">
+                <div class="sp-metric-icon"><i class="bi bi-check-circle-fill"></i></div>
+                <div><div class="sp-metric-val" th:text="${aprobados}">0</div><div class="sp-metric-lbl">Aprobados</div></div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="sp-metric-card sp-metric-warn">
+                <div class="sp-metric-icon"><i class="bi bi-clock-fill"></i></div>
+                <div><div class="sp-metric-val" th:text="${pendientes}">0</div><div class="sp-metric-lbl">Pendientes</div></div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="sp-metric-card sp-metric-purple">
+                <div class="sp-metric-icon"><i class="bi bi-award-fill"></i></div>
+                <div><div class="sp-metric-val" th:text="${conBeneficio}">0</div><div class="sp-metric-lbl">Con Beneficio</div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla -->
+    <div class="sp-card">
+        <div class="sp-card-header">
+            <span><i class="bi bi-table me-2"></i>
+                <span th:text="${tipo == 'UNICO' ? 'Informe Resultado Único' : 'Informe Resultado Total'}">Informe</span>
+            </span>
+            <span class="badge sp-badge-count" th:text="${#lists.size(alumnos)} + ' registros'">0</span>
+        </div>
+        <div class="sp-card-body p-0">
+            <div class="table-responsive">
+                <!-- TOTAL -->
+                <table th:if="${tipo != 'UNICO'}" class="table sp-table sp-searchable mb-0">
+                    <thead><tr>
+                        <th>Estudiante</th><th>Cédula</th><th>Facultad</th>
+                        <th>Estado SP</th><th>Puntaje Global</th><th>Clasif.</th>
+                        <th>Com.Esc.</th><th>Raz.Cuant.</th><th>Lect.Crít.</th>
+                        <th>Comp.Ciud.</th><th>Inglés</th><th>Módulo Esp.</th><th>Beneficio</th>
+                    </tr></thead>
+                    <tbody>
+                        <tr th:each="a : ${alumnos}">
+                            <td><div class="d-flex align-items-center gap-2"><div class="sp-avatar sp-avatar-sm"><i class="bi bi-person-fill"></i></div>
+                                <span style="font-weight:600;font-size:13px" th:text="${a.nombreCompleto}">-</span></div></td>
+                            <td th:text="${a.cedula}">-</td>
+                            <td style="font-size:12px" th:text="${a.facultadNombre}">-</td>
+                            <td><span class="badge" th:classappend="${a.estadoSaberPro == 'APROBADO' ? 'bg-success' : a.estadoSaberPro == 'PENDIENTE' ? 'bg-warning text-dark' : a.estadoSaberPro == 'RECHAZADO' ? 'bg-danger' : 'bg-info'}" th:text="${a.estadoSaberPro}">-</span></td>
+                            <td th:if="${a.resultadoTotal != null}"><span style="font-weight:800" th:classappend="${a.resultadoTotal.clasificacion == 'SUPERIOR' ? ' text-success' : a.resultadoTotal.clasificacion == 'ALTO' ? ' text-primary' : a.resultadoTotal.clasificacion == 'MEDIO' ? ' text-warning' : ' text-danger'}" th:text="${#numbers.formatDecimal(a.resultadoTotal.puntajeGlobal,1,0)}">0</span></td>
+                            <td th:unless="${a.resultadoTotal != null}">—</td>
+                            <td><span class="badge" th:classappend="${a.resultadoTotal?.clasificacion == 'SUPERIOR' ? 'bg-success' : a.resultadoTotal?.clasificacion == 'ALTO' ? 'bg-primary' : a.resultadoTotal?.clasificacion == 'MEDIO' ? 'bg-warning text-dark' : 'bg-danger'}" th:text="${a.resultadoTotal?.clasificacion ?: '—'}">-</span></td>
+                            <td th:text="${a.resultadoTotal != null ? #numbers.formatDecimal(a.resultadoTotal.comunicacionEscrita,1,0) : '—'}">-</td>
+                            <td th:text="${a.resultadoTotal != null ? #numbers.formatDecimal(a.resultadoTotal.razonamientoCuantitativo,1,0) : '—'}">-</td>
+                            <td th:text="${a.resultadoTotal != null ? #numbers.formatDecimal(a.resultadoTotal.lecturasCritica,1,0) : '—'}">-</td>
+                            <td th:text="${a.resultadoTotal != null ? #numbers.formatDecimal(a.resultadoTotal.competenciasCiudadanas,1,0) : '—'}">-</td>
+                            <td th:text="${a.resultadoTotal != null ? #numbers.formatDecimal(a.resultadoTotal.ingles,1,0) : '—'}">-</td>
+                            <td style="font-size:11px" th:text="${a.resultadoTotal?.moduloEspecificoNombre ?: '—'}">-</td>
+                            <td><span th:if="${a.tieneBeneficio}" class="badge bg-success"><i class="bi bi-award me-1"></i>Sí</span><span th:unless="${a.tieneBeneficio}" class="text-muted">No</span></td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(alumnos)}"><td colspan="13"><div class="sp-empty-state py-4"><i class="bi bi-inbox"></i><p>Sin resultados para los filtros aplicados</p></div></td></tr>
+                    </tbody>
+                </table>
+                <!-- ÚNICO -->
+                <table th:if="${tipo == 'UNICO'}" class="table sp-table sp-searchable mb-0">
+                    <thead><tr>
+                        <th>Estudiante</th><th>Cédula</th><th>Código Est.</th><th>Facultad</th>
+                        <th>Estado SP</th><th>Puntaje Global</th><th>Clasificación</th>
+                        <th>Módulo Específico</th><th>Puntaje Esp.</th><th>Beneficio</th>
+                    </tr></thead>
+                    <tbody>
+                        <tr th:each="a : ${alumnos}">
+                            <td><div class="d-flex align-items-center gap-2"><div class="sp-avatar sp-avatar-sm"><i class="bi bi-person-fill"></i></div>
+                                <span style="font-weight:600;font-size:13px" th:text="${a.nombreCompleto}">-</span></div></td>
+                            <td th:text="${a.cedula}">-</td>
+                            <td style="font-size:11px" th:text="${a.codigoEstudiante}">-</td>
+                            <td style="font-size:12px" th:text="${a.facultadNombre}">-</td>
+                            <td><span class="badge" th:classappend="${a.estadoSaberPro == 'APROBADO' ? 'bg-success' : a.estadoSaberPro == 'PENDIENTE' ? 'bg-warning text-dark' : 'bg-secondary'}" th:text="${a.estadoSaberPro}">-</span></td>
+                            <td th:if="${a.resultadoUnico != null}"><span style="font-weight:800" th:classappend="${a.resultadoUnico.clasificacion == 'SUPERIOR' ? ' text-success' : a.resultadoUnico.clasificacion == 'ALTO' ? ' text-primary' : ' text-warning'}" th:text="${#numbers.formatDecimal(a.resultadoUnico.puntajeGlobal,1,0)}">0</span></td>
+                            <td th:unless="${a.resultadoUnico != null}">—</td>
+                            <td><span class="badge" th:classappend="${a.resultadoUnico?.clasificacion == 'SUPERIOR' ? 'bg-success' : a.resultadoUnico?.clasificacion == 'ALTO' ? 'bg-primary' : 'bg-warning text-dark'}" th:text="${a.resultadoUnico?.clasificacion ?: '—'}">-</span></td>
+                            <td style="font-size:11px" th:text="${a.resultadoUnico?.moduloEspecificoNombre ?: '—'}">-</td>
+                            <td th:text="${a.resultadoUnico != null ? #numbers.formatDecimal(a.resultadoUnico.moduloEspecificoPuntaje,1,0) : '—'}">-</td>
+                            <td><span th:if="${a.tieneBeneficio}" class="badge bg-success">Sí</span><span th:unless="${a.tieneBeneficio}" class="text-muted">No</span></td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(alumnos)}"><td colspan="10"><div class="sp-empty-state py-4"><i class="bi bi-inbox"></i><p>Sin resultados</p></div></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</main>
+</div>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>

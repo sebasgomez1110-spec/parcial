@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Acceso | Saber Pro UTS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&amp;family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&amp;display=swap" rel="stylesheet"/>
+    <link th:href="@{/css/saberpro.css}" rel="stylesheet"/>
+</head>
+<body class="sp-login-body">
+
+<div class="sp-login-container">
+
+    <!-- Panel izquierdo -->
+    <div class="sp-login-panel">
+        <div class="sp-login-logo"><i class="bi bi-mortarboard-fill"></i></div>
+        <h2 class="sp-login-panel-title">Saber Pro<br/>UTS Bucaramanga</h2>
+        <p class="sp-login-panel-desc">
+            Plataforma institucional de gestión y seguimiento de exámenes de estado para las
+            Unidades Tecnológicas de Santander.
+        </p>
+        <div class="sp-login-features">
+            <div class="sp-login-feat"><i class="bi bi-shield-check"></i>Acceso seguro por rol institucional</div>
+            <div class="sp-login-feat"><i class="bi bi-graph-up-arrow"></i>Seguimiento de resultados en tiempo real</div>
+            <div class="sp-login-feat"><i class="bi bi-award"></i>Gestión de beneficios académicos</div>
+            <div class="sp-login-feat"><i class="bi bi-database-check"></i>MongoDB Atlas — Alta disponibilidad</div>
+        </div>
+        <div class="mt-5 pt-3" style="border-top:1px solid var(--c-border)">
+            <p style="color:var(--c-text3);font-size:11px;margin:0;line-height:2">
+                <i class="bi bi-key me-1" style="color:var(--c-accent)"></i>Credenciales de prueba:<br/>
+                admin@uts.edu.co / admin123<br/>
+                coordinacion@uts.edu.co / coord123<br/>
+                docente@uts.edu.co / doc123
+            </p>
+        </div>
+    </div>
+
+    <!-- Formulario -->
+    <div class="sp-login-form-container">
+        <div class="sp-login-form-inner">
+
+            <div class="text-center mb-5">
+                <div style="width:58px;height:58px;border-radius:14px;background:var(--c-accent);display:flex;align-items:center;justify-content:center;font-size:26px;color:#fff;margin:0 auto 18px;box-shadow:0 0 28px var(--c-accent-glow)">
+                    <i class="bi bi-mortarboard-fill"></i>
+                </div>
+                <h3 class="sp-login-title">Bienvenido</h3>
+                <p class="sp-login-subtitle mt-1">Ingresa con tus credenciales institucionales</p>
+            </div>
+
+            <div th:if="${param.error}" class="alert sp-alert mb-4 auto-hide" role="alert" style="border-left:3px solid var(--c-danger)">
+                <i class="bi bi-exclamation-triangle-fill" style="color:var(--c-danger)"></i>
+                <span>Credenciales incorrectas. Verifica tu email y contraseña.</span>
+            </div>
+            <div th:if="${param.logout}" class="alert sp-alert mb-4 auto-hide" role="alert" style="border-left:3px solid var(--c-ok)">
+                <i class="bi bi-check-circle-fill" style="color:var(--c-ok)"></i>
+                <span>Sesión cerrada correctamente.</span>
+            </div>
+
+            <form th:action="@{/login}" method="post">
+                <div class="mb-4">
+                    <label for="username" class="sp-form-label">Correo institucional</label>
+                    <div class="input-group sp-input-group">
+                        <span class="input-group-text sp-input-icon"><i class="bi bi-envelope-fill"></i></span>
+                        <input type="email" id="username" name="username"
+                               class="form-control sp-form-control"
+                               placeholder="usuario@uts.edu.co" required autofocus/>
+                    </div>
+                </div>
+                <div class="mb-5">
+                    <label for="password" class="sp-form-label">Contraseña</label>
+                    <div class="input-group sp-input-group">
+                        <span class="input-group-text sp-input-icon"><i class="bi bi-lock-fill"></i></span>
+                        <input type="password" id="password" name="password"
+                               class="form-control sp-form-control" placeholder="••••••••" required/>
+                        <button class="btn sp-pwd-toggle" type="button" onclick="togglePassword()">
+                            <i class="bi bi-eye-fill" id="pwdIcon"></i>
+                        </button>
+                    </div>
+                </div>
+                <button type="submit" class="btn sp-btn-primary w-100 sp-login-btn">
+                    <i class="bi bi-box-arrow-in-right me-2"></i>Iniciar Sesión
+                </button>
+            </form>
+
+            <div class="text-center mt-4">
+                <a th:href="@{/}" class="sp-back-link">
+                    <i class="bi bi-arrow-left me-1"></i>Volver al inicio
+                </a>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script th:src="@{/js/saberpro.js}"></script>
+</body>
+</html>

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Buscar por Cédula')}"></head>
+<body class="sp-body">
+<div th:replace="~{fragments/layout :: sidebar}"></div>
+<div class="sp-main">
+<div th:replace="~{fragments/layout :: topbar}"></div>
+<main class="sp-content">
+
+    <div class="sp-page-header">
+        <div>
+            <h1 class="sp-page-title font-display"><i class="bi bi-search me-2"></i>Buscar Estudiante por Cédula</h1>
+            <p class="sp-page-subtitle">RF-20/21/22 — Consulta individual con resultados Único y Total</p>
+        </div>
+    </div>
+
+    <!-- Buscador -->
+    <div class="sp-card mb-4">
+        <div class="sp-card-body">
+            <form th:action="@{/docente/alumnos/cedula}" method="get">
+                <div class="row g-2 align-items-end">
+                    <div class="col-md-5">
+                        <label class="sp-form-label">Número de Cédula</label>
+                        <div class="input-group sp-input-group">
+                            <span class="input-group-text sp-input-icon"><i class="bi bi-person-vcard-fill"></i></span>
+                            <input type="text" name="cedula" class="form-control sp-form-control"
+                                   placeholder="Ingresa el número de cédula del estudiante..."
+                                   th:value="${param.cedula}" autofocus/>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn sp-btn-primary w-100">
+                            <i class="bi bi-search me-2"></i>Buscar
+                        </button>
+                    </div>
+                    <div class="col-md-2" th:if="${param.cedula != null}">
+                        <a th:href="@{/docente/alumnos/cedula}" class="btn sp-btn-outline w-100">
+                            <i class="bi bi-x-circle me-1"></i>Limpiar
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Sin resultado -->
+    <div th:if="${param.cedula != null and alumno == null}" class="sp-card p-5 text-center">
+        <i class="bi bi-person-x-fill" style="font-size:3rem;color:var(--c-text2)"></i>
+        <h5 class="mt-3">No se encontró ningún estudiante</h5>
+        <p class="text-muted">Cédula: <strong th:text="${param.cedula}">-</strong> no está registrada en el sistema.</p>
+    </div>
+
+    <!-- Resultado encontrado -->
+    <div th:if="${alumno != null}">
+
+        <!-- Datos personales -->
+        <div class="sp-card mb-4">
+            <div class="sp-card-header">
+                <span><i class="bi bi-person-fill me-2"></i>Datos del Estudiante</span>
+                <!-- RF-25: Botón imprimir -->
+                <button onclick="window.print()" class="btn sp-btn-outline btn-sm">
+                    <i class="bi bi-printer me-1"></i>Imprimir
+                </button>
+            </div>
+            <div class="sp-card-body">
+                <div class="row g-3">
+                    <div class="col-md-3 col-6">
+                        <div style="font-size:11px;font-weight:700;color:#f97316;text-transform:uppercase;margin-bottom:3px">Nombre Completo</div>
+                        <div style="font-weight:600" th:text="${alumno.nombreCompleto}">-</div>
+                    </div>
+                    <div class="col-md-2 col-6">
+                        <div style="font-size:11px;font-weight:700;color:#f97316;text-transform:uppercase;margin-bottom:3px">Cédula</div>
+                        <div th:text="${alumno.cedula}">-</div>
+                    </div>
+                    <div class="col-md-4 col-6">
+                        <div style="font-size:11px;font-weight:700;color:#f97316;text-transform:uppercase;margin-bottom:3px">Facultad</div>
+                        <div style="font-size:13px" th:text="${alumno.facultadNombre}">-</div>
+                    </div>
+                    <div class="col-md-2 col-6">
+                        <div style="font-size:11px;font-weight:700;color:#f97316;text-transform:uppercase;margin-bottom:3px">Semestre</div>
+                        <div th:text="${alumno.semestre + '°'}">-</div>
+                    </div>
+                    <div class="col-md-1 col-6">
+                        <div style="font-size:11px;font-weight:700;color:#f97316;text-transform:uppercase;margin-bottom:3px">Estado</div>
+                        <span class="badge" th:classappend="${alumno.estadoSaberPro == 'APROBADO' ? 'bg-success' : alumno.estadoSaberPro == 'PENDIENTE' ? 'bg-warning text-dark' : 'bg-secondary'}" th:text="${alumno.estadoSaberPro}">-</span>
+                    </div>
+                    <div class="col-12" th:if="${alumno.tieneBeneficio}">
+                        <div style="background:rgba(249,115,22,.15);border:1.5px solid #6ee7b7;border-radius:8px;padding:12px 16px;display:inline-flex;align-items:center;gap:10px">
+                            <i class="bi bi-award-fill" style="color:#f97316;font-size:1.4rem"></i>
+                            <div>
+                                <div style="font-weight:700;color:#f97316">Beneficio asignado</div>
+                                <div style="font-size:12px;color:var(--c-text2)" th:text="${alumno.tipoBeneficio}">tipo</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RF-21: Resultado Único -->
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="sp-card h-100">
+                    <div class="sp-card-header" style="background:linear-gradient(135deg,#ede9fe,#fff)">
+                        <span style="color:#7c3aed;font-weight:700"><i class="bi bi-clipboard-data-fill me-2"></i>Resultado Único</span>
+                        <span class="badge" th:if="${alumno.resultadoUnico != null}"
+                              th:classappend="${alumno.resultadoUnico.clasificacion == 'SUPERIOR' ? 'bg-success' : alumno.resultadoUnico.clasificacion == 'ALTO' ? 'bg-primary' : alumno.resultadoUnico.clasificacion == 'MEDIO' ? 'bg-warning text-dark' : 'bg-danger'}"
+                              th:text="${alumno.resultadoUnico.clasificacion}">-</span>
+                    </div>
+                    <div class="sp-card-body" th:if="${alumno.resultadoUnico != null}">
+                        <div class="text-center mb-3">
+                            <div style="font-size:48px;font-weight:900;color:#7c3aed" th:text="${#numbers.formatDecimal(alumno.resultadoUnico.puntajeGlobal,1,0)}">0</div>
+                            <div style="font-size:11px;color:var(--c-text2)">Puntaje Global</div>
+                        </div>
+                        <div th:each="entry : ${ {{'Com. Escrita', alumno.resultadoUnico.comunicacionEscrita},{'Raz. Cuant.', alumno.resultadoUnico.razonamientoCuantitativo},{'Lect. Crítica', alumno.resultadoUnico.lecturasCritica},{'Comp. Ciudadanas', alumno.resultadoUnico.competenciasCiudadanas},{'Inglés', alumno.resultadoUnico.ingles}} }}"
+                             th:if="false"><!-- placeholder --></div>
+                        <div class="sp-modulo-row"><span style="font-size:12px">Com. Escrita</span><div class="sp-modulo-bar-bg"><div class="sp-modulo-bar" th:style="'width:' + ${(alumno.resultadoUnico.comunicacionEscrita/300.0)*100} + '%'"></div></div><span class="sp-score" th:text="${#numbers.formatDecimal(alumno.resultadoUnico.comunicacionEscrita,1,0)}">0</span></div>
+                        <div class="sp-modulo-row"><span style="font-size:12px">Raz. Cuantitativo</span><div class="sp-modulo-bar-bg"><div class="sp-modulo-bar" th:style="'width:' + ${(alumno.resultadoUnico.razonamientoCuantitativo/300.0)*100} + '%'"></div></div><span class="sp-score" th:text="${#numbers.formatDecimal(alumno.resultadoUnico.razonamientoCuantitativo,1,0)}">0</span></div>
+                        <div class="sp-modulo-row"><span style="font-size:12px">Lect. Crítica</span><div class="sp-modulo-bar-bg"><div class="sp-modulo-bar" th:style="'width:' + ${(alumno.resultadoUnico.lecturasCritica/300.0)*100} + '%'"></div></div><span class="sp-score" th:text="${#numbers.formatDecimal(alumno.resultadoUnico.lecturasCritica,1,0)}">0</span></div>
+                        <div class="sp-modulo-row"><span style="font-size:12px">Comp. Ciudadanas</span><div class="sp-modulo-bar-bg"><div class="sp-modulo-bar" th:style="'width:' + ${(alumno.resultadoUnico.competenciasCiudadanas/300.0)*100} + '%'"></div></div><span class="sp-score" th:text="${#numbers.formatDecimal(alumno.resultadoUnico.competenciasCiudadanas,1,0)}">0</span></div>
+                        <div class="sp-modulo-row"><span style="font-size:12px">Inglés</span><div class="sp-modulo-bar-bg"><div class="sp-modulo-bar" th:style="'width:' + ${(alumno.resultadoUnico.ingles/300.0)*100} + '%'"></div></div><span class="sp-score" th:text="${#numbers.formatDecimal(alumno.resultadoUnico.ingles,1,0)}">0</span></div>
+                        <div class="sp-modulo-row" style="border-top:2px solid #f97316;margin-top:8px;padding-top:10px">
+                            <span style="font-size:12px;font-weight:700" th:text="${alumno.resultadoUnico.moduloEspecificoNombre}">Módulo Esp.</span>
+                            <div class="sp-modulo-bar-bg"><div class="sp-modulo-bar" style="background:#7c3aed" th:style="'width:' + ${(alumno.resultadoUnico.moduloEspecificoPuntaje/300.0)*100} + '%;background:#7c3aed'"></div></div>
+                            <span class="sp-score sp-score-alto" th:text="${#numbers.formatDecimal(alumno.resultadoUnico.moduloEspecificoPuntaje,1,0)}">0</span>
+                        </div>
+                    </div>
+                    <div class="sp-card-body" th:unless="${alumno.resultadoUnico != null}">
+                        <div class="sp-empty-state py-4"><i class="bi bi-clipboard-x"></i><p>Sin resultado único registrado</p></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RF-22: Resultado Total -->
+            <div class="col-md-6">
+                <div class="sp-card h-100">
+                    <div class="sp-card-header" style="background:linear-gradient(135deg,#fef3c7,#fff)">
+                        <span style="color:#d97706;font-weight:700"><i class="bi bi-clipboard2-check-fill me-2"></i>Resultado Total</span>
+                        <span class="badge" th:if="${alumno.resultadoTotal != null}"
+                              th:classappend="${alumno.resultadoTotal.clasificacion == 'SUPERIOR' ? 'bg-success' : alumno.resultadoTotal.clasificacion == 'ALTO' ? 'bg-primary' : alumno.resultadoTotal.clasificacion == 'MEDIO' ? 'bg-warning text-dark' : 'bg-danger'}"
+                              th:text="${alumno.resultadoTotal.clasificacion}">-</span>
+                    </div>
+                    <div class="sp-card-body" th:if="${alumno.resultadoTotal != null}">
+                        <div class="text-center mb-3">
+                            <div style="font-size:48px;font-weight:900;color:#d97706" th:text="${#numbers.formatDecimal(alumno.resultadoTotal.puntajeGlobal,1,0)}">0</div>
+                            <div style="font-size:11px;color:var(--c-text2)">Puntaje Global</div>
+                            <div style="font-size:11px;color:var(--c-text2);margin-top:2px">Período: <span th:text="${alumno.resultadoTotal.periodo}">-</span></div>
+                        </div>
+                        <div class="sp-modulo-row"><span style="font-size:12px">Com. Escrita</span><div class="sp-modulo-bar-bg"><div class="sp-modulo-bar" style="background:#d97706" th:style="'width:' + ${(alumno.resultadoTotal.comunicacionEscrita/300.0)*100} + '%;background:#d97706'"></div></div><span th:text="${#numbers.formatDecimal(alumno.resultadoTotal.comunicacionEscrita,1,0)}">0</span></div>
+                        <div class="sp-modulo-row"><span style="font-size:12px">Raz. Cuantitativo</span><div class="sp-modulo-bar-bg"><div class="sp-modulo-bar" style="background:#d97706" th:style="'width:' + ${(alumno.resultadoTotal.razonamientoCuantitativo/300.0)*100} + '%;background:#d97706'"></div></div><span th:text="${#numbers.formatDecimal(alumno.resultadoTotal.razonamientoCuantitativo,1,0)}">0</span></div>
+                        <div class="sp-modulo-row"><span style="font-size:12px">Lect. Crítica</span><div class="sp-modulo-bar-bg"><div class="sp-modulo-bar" style="background:#d97706" th:style="'width:' + ${(alumno.resultadoTotal.lecturasCritica/300.0)*100} + '%;background:#d97706'"></div></div><span th:text="${#numbers.formatDecimal(alumno.resultadoTotal.lecturasCritica,1,0)}">0</span></div>
+                        <div class="sp-modulo-row"><span style="font-size:12px">Comp. Ciudadanas</span><div class="sp-modulo-bar-bg"><div class="sp-modulo-bar" style="background:#d97706" th:style="'width:' + ${(alumno.resultadoTotal.competenciasCiudadanas/300.0)*100} + '%;background:#d97706'"></div></div><span th:text="${#numbers.formatDecimal(alumno.resultadoTotal.competenciasCiudadanas,1,0)}">0</span></div>
+                        <div class="sp-modulo-row"><span style="font-size:12px">Inglés</span><div class="sp-modulo-bar-bg"><div class="sp-modulo-bar" style="background:#d97706" th:style="'width:' + ${(alumno.resultadoTotal.ingles/300.0)*100} + '%;background:#d97706'"></div></div><span th:text="${#numbers.formatDecimal(alumno.resultadoTotal.ingles,1,0)}">0</span></div>
+                        <div class="sp-modulo-row" style="border-top:2px solid #d97706;margin-top:8px;padding-top:10px">
+                            <span style="font-size:12px;font-weight:700" th:text="${alumno.resultadoTotal.moduloEspecificoNombre}">Módulo Esp.</span>
+                            <div class="sp-modulo-bar-bg"><div class="sp-modulo-bar" style="background:#d97706" th:style="'width:' + ${(alumno.resultadoTotal.moduloEspecificoPuntaje/300.0)*100} + '%;background:#d97706'"></div></div>
+                            <span style="font-weight:700;color:#d97706" th:text="${#numbers.formatDecimal(alumno.resultadoTotal.moduloEspecificoPuntaje,1,0)}">0</span>
+                        </div>
+                    </div>
+                    <div class="sp-card-body" th:unless="${alumno.resultadoTotal != null}">
+                        <div class="sp-empty-state py-4"><i class="bi bi-clipboard-x"></i><p>Sin resultado total registrado</p></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</main>
+</div>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+<style>@media print{.sp-sidebar,.sp-topbar{display:none!important}.sp-main{margin-left:0!important}}</style>
+</body>
+</html>

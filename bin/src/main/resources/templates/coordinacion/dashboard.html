@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Dashboard — Coordinación')}"></head>
+<body class="sp-body">
+<div th:replace="~{fragments/layout :: sidebar}"></div>
+<div class="sp-main">
+<div th:replace="~{fragments/layout :: topbar}"></div>
+<main class="sp-content">
+
+    <!-- HEADER -->
+    <div class="sp-page-header">
+        <div>
+            <h1 class="sp-page-title font-display"><i class="bi bi-diagram-3-fill me-2" style="color:#2563eb"></i>Panel de Coordinación</h1>
+            <p class="sp-page-subtitle">Gestión integral de estudiantes y proceso Saber Pro — UTS</p>
+        </div>
+        <a th:href="@{/coordinacion/alumnos}" class="btn sp-btn-primary">
+            <i class="bi bi-plus-circle-fill me-2"></i>Nuevo Estudiante
+        </a>
+    </div>
+
+    <!-- MÉTRICAS -->
+    <div class="row g-4 mb-4">
+        <div class="col-6 col-lg-3">
+            <div class="sp-metric-card sp-metric-green">
+                <div class="sp-metric-icon"><i class="bi bi-people-fill"></i></div>
+                <div>
+                    <div class="sp-metric-val" th:text="${totalAlumnos}">0</div>
+                    <div class="sp-metric-lbl">Total Estudiantes</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="sp-metric-card sp-metric-blue">
+                <div class="sp-metric-icon"><i class="bi bi-check-circle-fill"></i></div>
+                <div>
+                    <div class="sp-metric-val" th:text="${aprobados}">0</div>
+                    <div class="sp-metric-lbl">Aprobados Saber Pro</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="sp-metric-card sp-metric-warn">
+                <div class="sp-metric-icon"><i class="bi bi-hourglass-split"></i></div>
+                <div>
+                    <div class="sp-metric-val" th:text="${pendientes}">0</div>
+                    <div class="sp-metric-lbl">Pendientes aprobación</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="sp-metric-card sp-metric-purple">
+                <div class="sp-metric-icon"><i class="bi bi-award-fill"></i></div>
+                <div>
+                    <div class="sp-metric-val" th:text="${conBeneficio}">0</div>
+                    <div class="sp-metric-lbl">Con beneficio</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ACCESOS RÁPIDOS — los 6 módulos de coordinación -->
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-4 col-lg-2">
+            <a th:href="@{/coordinacion/alumnos}" class="sp-coord-card">
+                <i class="bi bi-person-lines-fill" style="color:#2563eb"></i>
+                <span>Gestión Estudiantes</span>
+            </a>
+        </div>
+        <div class="col-6 col-md-4 col-lg-2">
+            <a th:href="@{/coordinacion/aprobar}" class="sp-coord-card">
+                <i class="bi bi-check-circle-fill" style="color:#f97316"></i>
+                <span>Aprobar Saber Pro</span>
+            </a>
+        </div>
+        <div class="col-6 col-md-4 col-lg-2">
+            <a th:href="@{/coordinacion/informe/alumnos(tipo='TOTAL')}" class="sp-coord-card">
+                <i class="bi bi-bar-chart-fill" style="color:#d97706"></i>
+                <span>Informe Total</span>
+            </a>
+        </div>
+        <div class="col-6 col-md-4 col-lg-2">
+            <a th:href="@{/coordinacion/informe/alumnos(tipo='UNICO')}" class="sp-coord-card">
+                <i class="bi bi-clipboard-data-fill" style="color:#7c3aed"></i>
+                <span>Informe Único</span>
+            </a>
+        </div>
+        <div class="col-6 col-md-4 col-lg-2">
+            <a th:href="@{/coordinacion/informe/beneficios}" class="sp-coord-card">
+                <i class="bi bi-award-fill" style="color:#0d9488"></i>
+                <span>Informe Beneficios</span>
+            </a>
+        </div>
+        <div class="col-6 col-md-4 col-lg-2">
+            <a th:href="@{/coordinacion/resoluciones}" class="sp-coord-card">
+                <i class="bi bi-file-earmark-ruled-fill" style="color:#e11d48"></i>
+                <span>Resoluciones</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- TABLA pendientes -->
+    <div class="sp-card">
+        <div class="sp-card-header">
+            <span><i class="bi bi-hourglass-split me-2" style="color:#d97706"></i>Estudiantes Pendientes de Aprobación</span>
+            <a th:href="@{/coordinacion/aprobar}" class="btn sp-btn-primary btn-sm">
+                <i class="bi bi-check-circle me-1"></i>Gestionar aprobaciones
+            </a>
+        </div>
+        <div class="sp-card-body p-0">
+            <div class="table-responsive">
+                <table class="table sp-table mb-0">
+                    <thead>
+                        <tr>
+                            <th>Estudiante</th>
+                            <th>Cédula</th>
+                            <th>Carrera</th>
+                            <th>Semestre</th>
+                            <th class="text-center">Aprobar</th>
+                            <th class="text-center">Rechazar</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="a : ${ultimosAlumnos}">
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="sp-avatar sp-avatar-sm"><i class="bi bi-person-fill"></i></div>
+                                    <span style="font-weight:600;font-size:13px" th:text="${a.nombreCompleto}">Nombre</span>
+                                </div>
+                            </td>
+                            <td th:text="${a.cedula}">-</td>
+                            <td style="font-size:12px" th:text="${a.facultadNombre}">-</td>
+                            <td th:text="${a.semestre + '°'}">-</td>
+                            <td class="text-center">
+                                <form th:action="@{/coordinacion/aprobar/{id}(id=${a.id})}" method="post" class="d-inline">
+                                    <button type="submit" class="btn sp-btn-primary btn-sm">
+                                        <i class="bi bi-check-lg"></i>
+                                    </button>
+                                </form>
+                            </td>
+                            <td class="text-center">
+                                <form th:action="@{/coordinacion/rechazar/{id}(id=${a.id})}" method="post" class="d-inline">
+                                    <button type="submit" class="btn btn-sm btn-danger">
+                                        <i class="bi bi-x-lg"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(ultimosAlumnos)}">
+                            <td colspan="6">
+                                <div class="sp-empty-state py-4">
+                                    <i class="bi bi-check2-all"></i>
+                                    <p>¡Sin pendientes! Todos los estudiantes están al día.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</main>
+</div>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+<style>
+.sp-coord-card{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:20px 12px;background:#fff;border:1.5px solid var(--sp-border-soft);border-radius:var(--sp-radius);text-decoration:none;color:var(--c-text);font-size:12px;font-weight:600;text-align:center;transition:all .2s;min-height:90px}
+.sp-coord-card i{font-size:1.8rem}
+.sp-coord-card:hover{transform:translateY(-3px);box-shadow:var(--sp-shadow-md);border-color:#f97316;color:var(--c-text)}
+</style>
+</body>
+</html>

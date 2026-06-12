@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Resultados Total')}"></head>
+<body class="sp-body">
+<div th:replace="~{fragments/layout :: sidebar}"></div>
+<div class="sp-main">
+<div th:replace="~{fragments/layout :: topbar}"></div>
+<main class="sp-content">
+
+    <div class="sp-page-header">
+        <div>
+            <h1 class="sp-page-title font-display"><i class="bi bi-clipboard2-check-fill me-2"></i>Resultados Total Saber Pro</h1>
+            <p class="sp-page-subtitle">Consolidado completo de todos tus módulos evaluados</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a th:href="@{/estudiante/resultado/unico}" class="btn sp-btn-outline"><i class="bi bi-clipboard-data me-1"></i>Ver Único</a>
+            <a th:href="@{/estudiante/dashboard}" class="btn sp-btn-outline"><i class="bi bi-arrow-left me-1"></i>Volver</a>
+        </div>
+    </div>
+
+    <div th:if="${resultado == null}" class="sp-card p-5 text-center">
+        <i class="bi bi-clipboard2-x-fill" style="font-size:3rem;color:var(--c-text2)"></i>
+        <h5 class="mt-3" style="color:#f97316">Resultados no disponibles aún</h5>
+        <p class="text-muted">Serán cargados una vez se reciban los reportes del ICFES.</p>
+    </div>
+
+    <div th:if="${resultado != null}">
+
+        <!-- Header informe -->
+        <div class="sp-informe-header mb-4">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <div class="sp-informe-title">
+                        <i class="bi bi-mortarboard-fill me-2"></i>Informe de Resultados — Prueba Saber Pro
+                    </div>
+                    <div class="sp-informe-sub" th:text="${alumno != null ? alumno.nombreCompleto : ''}">Estudiante</div>
+                    <div class="sp-informe-sub" th:text="${alumno != null ? alumno.facultadNombre : ''}">Carrera</div>
+                    <div class="sp-informe-sub">Período: <span th:text="${resultado.periodo}">2025-2</span> | Código: <span th:text="${alumno != null ? alumno.codigoEstudiante : ''}">-</span></div>
+                </div>
+                <div class="col-md-4 text-end" th:if="${alumno != null}">
+                    <div style="font-size:11px;opacity:.75">Puntaje Global</div>
+                    <div style="font-size:56px;font-weight:900;line-height:1" th:text="${#numbers.formatDecimal(resultado.puntajeGlobal,1,0)}">0</div>
+                    <div style="font-size:13px;background:rgba(255,255,255,.2);border-radius:20px;padding:3px 14px;display:inline-block" th:text="${resultado.clasificacion}">nivel</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabla completa de módulos -->
+        <div class="sp-card mb-4">
+            <div class="sp-card-header">
+                <span><i class="bi bi-table me-2"></i>Puntajes por Competencia</span>
+                <button class="btn sp-btn-outline btn-sm" onclick="window.print()"><i class="bi bi-printer me-1"></i>Imprimir</button>
+            </div>
+            <div class="sp-card-body p-0">
+                <table class="table sp-table mb-0">
+                    <thead>
+                        <tr>
+                            <th>Competencia / Módulo</th>
+                            <th class="text-center">Puntaje</th>
+                            <th class="text-center">Clasificación</th>
+                            <th>Barra</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><i class="bi bi-pencil-fill me-2 text-primary"></i>Comunicación Escrita</td>
+                            <td class="text-center fw-bold" th:text="${#numbers.formatDecimal(resultado.comunicacionEscrita,1,0)}">0</td>
+                            <td class="text-center">
+                                <span class="badge" th:classappend="${resultado.comunicacionEscrita >= 170 ? 'bg-success' : resultado.comunicacionEscrita >= 145 ? 'bg-primary' : resultado.comunicacionEscrita >= 120 ? 'bg-warning text-dark' : 'bg-danger'}"
+                                      th:text="${resultado.comunicacionEscrita >= 170 ? 'Nivel 4' : resultado.comunicacionEscrita >= 145 ? 'Nivel 3' : resultado.comunicacionEscrita >= 120 ? 'Nivel 2' : 'Nivel 1'}">N</span>
+                            </td>
+                            <td><div class="sp-modulo-bar-bg" style="width:100%"><div class="sp-modulo-bar" th:style="'width:' + ${(resultado.comunicacionEscrita/300.0)*100} + '%'"></div></div></td>
+                        </tr>
+                        <tr>
+                            <td><i class="bi bi-calculator-fill me-2 text-warning"></i>Razonamiento Cuantitativo</td>
+                            <td class="text-center fw-bold" th:text="${#numbers.formatDecimal(resultado.razonamientoCuantitativo,1,0)}">0</td>
+                            <td class="text-center">
+                                <span class="badge" th:classappend="${resultado.razonamientoCuantitativo >= 170 ? 'bg-success' : resultado.razonamientoCuantitativo >= 145 ? 'bg-primary' : resultado.razonamientoCuantitativo >= 120 ? 'bg-warning text-dark' : 'bg-danger'}"
+                                      th:text="${resultado.razonamientoCuantitativo >= 170 ? 'Nivel 4' : resultado.razonamientoCuantitativo >= 145 ? 'Nivel 3' : resultado.razonamientoCuantitativo >= 120 ? 'Nivel 2' : 'Nivel 1'}">N</span>
+                            </td>
+                            <td><div class="sp-modulo-bar-bg" style="width:100%"><div class="sp-modulo-bar" th:style="'width:' + ${(resultado.razonamientoCuantitativo/300.0)*100} + '%'"></div></div></td>
+                        </tr>
+                        <tr>
+                            <td><i class="bi bi-book-fill me-2 text-info"></i>Lectura Crítica</td>
+                            <td class="text-center fw-bold" th:text="${#numbers.formatDecimal(resultado.lecturasCritica,1,0)}">0</td>
+                            <td class="text-center">
+                                <span class="badge" th:classappend="${resultado.lecturasCritica >= 170 ? 'bg-success' : resultado.lecturasCritica >= 145 ? 'bg-primary' : resultado.lecturasCritica >= 120 ? 'bg-warning text-dark' : 'bg-danger'}"
+                                      th:text="${resultado.lecturasCritica >= 170 ? 'Nivel 4' : resultado.lecturasCritica >= 145 ? 'Nivel 3' : resultado.lecturasCritica >= 120 ? 'Nivel 2' : 'Nivel 1'}">N</span>
+                            </td>
+                            <td><div class="sp-modulo-bar-bg" style="width:100%"><div class="sp-modulo-bar" th:style="'width:' + ${(resultado.lecturasCritica/300.0)*100} + '%'"></div></div></td>
+                        </tr>
+                        <tr>
+                            <td><i class="bi bi-people-fill me-2 text-success"></i>Competencias Ciudadanas</td>
+                            <td class="text-center fw-bold" th:text="${#numbers.formatDecimal(resultado.competenciasCiudadanas,1,0)}">0</td>
+                            <td class="text-center">
+                                <span class="badge" th:classappend="${resultado.competenciasCiudadanas >= 170 ? 'bg-success' : resultado.competenciasCiudadanas >= 145 ? 'bg-primary' : resultado.competenciasCiudadanas >= 120 ? 'bg-warning text-dark' : 'bg-danger'}"
+                                      th:text="${resultado.competenciasCiudadanas >= 170 ? 'Nivel 4' : resultado.competenciasCiudadanas >= 145 ? 'Nivel 3' : resultado.competenciasCiudadanas >= 120 ? 'Nivel 2' : 'Nivel 1'}">N</span>
+                            </td>
+                            <td><div class="sp-modulo-bar-bg" style="width:100%"><div class="sp-modulo-bar" th:style="'width:' + ${(resultado.competenciasCiudadanas/300.0)*100} + '%'"></div></div></td>
+                        </tr>
+                        <tr>
+                            <td><i class="bi bi-translate me-2" style="color:#7c3aed"></i>Inglés</td>
+                            <td class="text-center fw-bold" th:text="${#numbers.formatDecimal(resultado.ingles,1,0)}">0</td>
+                            <td class="text-center">
+                                <span class="badge" th:classappend="${resultado.ingles >= 170 ? 'bg-success' : resultado.ingles >= 145 ? 'bg-primary' : resultado.ingles >= 120 ? 'bg-warning text-dark' : 'bg-danger'}"
+                                      th:text="${resultado.ingles >= 170 ? 'Nivel 4' : resultado.ingles >= 145 ? 'Nivel 3' : resultado.ingles >= 120 ? 'Nivel 2' : 'Nivel 1'}">N</span>
+                            </td>
+                            <td><div class="sp-modulo-bar-bg" style="width:100%"><div class="sp-modulo-bar" style="background:#7c3aed" th:style="'width:' + ${(resultado.ingles/300.0)*100} + '%;background:#7c3aed'"></div></div></td>
+                        </tr>
+                        <tr style="background:rgba(249,115,22,.15)">
+                            <td><i class="bi bi-star-fill me-2" style="color:#f97316"></i><strong th:text="${resultado.moduloEspecificoNombre}">Módulo Específico</strong></td>
+                            <td class="text-center fw-bold" style="color:#f97316" th:text="${#numbers.formatDecimal(resultado.moduloEspecificoPuntaje,1,0)}">0</td>
+                            <td class="text-center">
+                                <span class="badge" th:classappend="${resultado.moduloEspecificoPuntaje >= 170 ? 'bg-success' : resultado.moduloEspecificoPuntaje >= 145 ? 'bg-primary' : resultado.moduloEspecificoPuntaje >= 120 ? 'bg-warning text-dark' : 'bg-danger'}"
+                                      th:text="${resultado.moduloEspecificoPuntaje >= 170 ? 'Nivel 4' : resultado.moduloEspecificoPuntaje >= 145 ? 'Nivel 3' : resultado.moduloEspecificoPuntaje >= 120 ? 'Nivel 2' : 'Nivel 1'}">N</span>
+                            </td>
+                            <td><div class="sp-modulo-bar-bg" style="width:100%"><div class="sp-modulo-bar" th:style="'width:' + ${(resultado.moduloEspecificoPuntaje/300.0)*100} + '%'"></div></div></td>
+                        </tr>
+                        <tr class="table-active">
+                            <td><strong><i class="bi bi-trophy-fill me-2 text-warning"></i>PUNTAJE GLOBAL</strong></td>
+                            <td class="text-center" style="font-size:18px;font-weight:900;color:#f97316" th:text="${#numbers.formatDecimal(resultado.puntajeGlobal,1,0)}">0</td>
+                            <td class="text-center">
+                                <span class="badge fs-6" th:classappend="${resultado.clasificacion == 'SUPERIOR' ? 'bg-success' : resultado.clasificacion == 'ALTO' ? 'bg-primary' : resultado.clasificacion == 'MEDIO' ? 'bg-warning text-dark' : 'bg-danger'}"
+                                      th:text="${resultado.clasificacion}">nivel</span>
+                            </td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Beneficio -->
+        <div th:if="${alumno != null and alumno.tieneBeneficio}" class="sp-card">
+            <div class="sp-card-body d-flex align-items-center gap-4">
+                <i class="bi bi-award-fill" style="font-size:3rem;color:#f97316"></i>
+                <div>
+                    <h5 style="color:#f97316;margin:0">¡Beneficio Académico Asignado!</h5>
+                    <p class="mb-0 text-muted">Tu puntaje te hace acreedor al beneficio: <strong th:text="${alumno.tipoBeneficio}">tipo</strong></p>
+                    <a th:href="@{/estudiante/resoluciones}" class="btn sp-btn-primary mt-2 btn-sm">
+                        <i class="bi bi-file-earmark-text me-1"></i>Ver resolución completa
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</main>
+</div>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>

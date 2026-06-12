@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Saber Pro UTS')}">
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Gestión de Docentes | Saber Pro</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <link th:href="@{/css/saberpro.css}" rel="stylesheet"/>
+</head>
+<body class="sp-body">
+<div th:replace="~{fragments/layout :: sidebar}"></div>
+<div class="sp-main">
+<div th:replace="~{fragments/layout :: topbar}"></div>
+<main class="sp-content">
+
+    <div class="sp-page-header">
+        <div>
+            <h1 class="sp-page-title font-display"><i class="bi bi-people-fill me-2"></i>Gestión de Docentes</h1>
+            <p class="sp-page-subtitle">Registro y administración del cuerpo docente</p>
+        </div>
+        <button class="btn sp-btn-primary" data-bs-toggle="modal" data-bs-target="#modalDocente"
+                onclick="limpiarFormulario()">
+            <i class="bi bi-plus-circle-fill me-2"></i>Nuevo Docente
+        </button>
+    </div>
+
+    <!-- Alerta -->
+    <div th:if="${mensaje}" class="alert sp-alert"
+         th:classappend="'alert-' + ${tipoMensaje}" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i>
+        <span th:text="${mensaje}"></span>
+        <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
+    </div>
+
+    <!-- Tabla docentes -->
+    <div class="sp-card">
+        <div class="sp-card-header">
+            <h5><i class="bi bi-table me-2"></i>Lista de Docentes</h5>
+            <span class="badge sp-badge-count" th:text="${#lists.size(docentes)} + ' registros'">0 registros</span>
+        </div>
+        <div class="sp-card-body p-0">
+            <div class="table-responsive">
+                <table class="table sp-table mb-0" id="tablaDocentes">
+                    <thead>
+                        <tr>
+                            <th>Nombre Completo</th>
+                            <th>Cédula</th>
+                            <th>Email</th>
+                            <th>Teléfono</th>
+                            <th>Estado</th>
+                            <th class="text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="d : ${docentes}">
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="sp-avatar sp-avatar-sm">
+                                        <i class="bi bi-person-fill"></i>
+                                    </div>
+                                    <span th:text="${d.nombreCompleto}">Nombre</span>
+                                </div>
+                            </td>
+                            <td th:text="${d.cedula}">-</td>
+                            <td th:text="${d.email}">-</td>
+                            <td th:text="${d.telefono}">-</td>
+                            <td>
+                                <span th:if="${d.activo}" class="badge bg-success">Activo</span>
+                                <span th:unless="${d.activo}" class="badge bg-secondary">Inactivo</span>
+                            </td>
+                            <td class="text-center">
+                                <div class="sp-action-btns">
+                                    <a th:href="@{/admin/docentes/editar/{id}(id=${d.id})}"
+                                       class="btn sp-btn-icon sp-btn-edit" title="Editar">
+                                        <i class="bi bi-pencil-fill"></i>
+                                    </a>
+                                    <a th:href="@{/admin/docentes/eliminar/{id}(id=${d.id})}"
+                                       class="btn sp-btn-icon sp-btn-delete" title="Eliminar"
+                                       onclick="return confirm('¿Eliminar este docente?')">
+                                        <i class="bi bi-trash-fill"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(docentes)}">
+                            <td colspan="6" class="text-center py-4 text-muted">
+                                <i class="bi bi-inbox me-2 fs-4"></i><br/>No hay docentes registrados
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL FORMULARIO -->
+    <div class="modal fade" id="modalDocente" tabindex="-1" aria-labelledby="modalDocenteLabel">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content sp-modal">
+                <div class="modal-header sp-modal-header">
+                    <h5 class="modal-title" id="modalDocenteLabel">
+                        <i class="bi bi-person-fill me-2"></i>
+                        <span th:text="${docente.id != null ? 'Editar Docente' : 'Nuevo Docente'}">Formulario Docente</span>
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form th:action="@{/admin/docentes/guardar}" th:object="${docente}" method="post">
+                        <input type="hidden" th:field="*{id}"/>
+                        <input type="hidden" th:field="*{rol}" th:value="'DOCENTE'"/>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="sp-form-label">Nombre *</label>
+                                <input type="text" th:field="*{nombre}" class="form-control sp-form-control"
+                                       placeholder="Nombre del docente" required/>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="sp-form-label">Apellido *</label>
+                                <input type="text" th:field="*{apellido}" class="form-control sp-form-control"
+                                       placeholder="Apellido del docente" required/>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="sp-form-label">Cédula *</label>
+                                <input type="text" th:field="*{cedula}" class="form-control sp-form-control"
+                                       placeholder="Número de cédula" required/>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="sp-form-label">Teléfono</label>
+                                <input type="text" th:field="*{telefono}" class="form-control sp-form-control"
+                                       placeholder="Teléfono de contacto"/>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="sp-form-label">Email institucional *</label>
+                                <input type="email" th:field="*{email}" class="form-control sp-form-control"
+                                       placeholder="correo@institucion.edu.co" required/>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="sp-form-label">Contraseña *</label>
+                                <input type="password" th:field="*{password}" class="form-control sp-form-control"
+                                       placeholder="Mínimo 8 caracteres"/>
+                            </div>
+                        </div>
+                        <div class="d-flex gap-2 justify-content-end mt-4">
+                            <button type="button" class="btn sp-btn-outline" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn sp-btn-primary">
+                                <i class="bi bi-save-fill me-2"></i>Guardar Docente
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Auto-abrir modal si hay docente a editar -->
+    <script th:inline="javascript">
+        const tieneId = /*[[${docente.id}]]*/ null;
+        if (tieneId) {
+            new bootstrap.Modal(document.getElementById('modalDocente')).show();
+        }
+    </script>
+
+</main>
+</div>
+
+
+<div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>

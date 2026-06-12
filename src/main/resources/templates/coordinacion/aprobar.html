@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Saber Pro UTS')}">
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Aprobar Saber Pro | Coordinación</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <link th:href="@{/css/saberpro.css}" rel="stylesheet"/>
+</head>
+<body class="sp-body">
+<div th:replace="~{fragments/layout :: sidebar}"></div>
+<div class="sp-main">
+<div th:replace="~{fragments/layout :: topbar}"></div>
+<main class="sp-content">
+
+    <div class="sp-page-header">
+        <div>
+            <h1 class="sp-page-title font-display"><i class="bi bi-check-circle-fill me-2"></i>Aprobación Saber Pro</h1>
+            <p class="sp-page-subtitle">Revise y apruebe las inscripciones de alumnos para el examen</p>
+        </div>
+    </div>
+
+    <div th:if="${mensaje}" class="alert sp-alert"
+         th:classappend="'alert-' + ${tipoMensaje}" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i>
+        <span th:text="${mensaje}"></span>
+        <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
+    </div>
+
+    <!-- Tabs estados -->
+    <ul class="nav sp-tabs mb-4" id="tabsAprobacion">
+        <li class="nav-item">
+            <button class="nav-link sp-tab active" data-bs-toggle="tab" data-bs-target="#pendientes">
+                <i class="bi bi-hourglass-split me-1"></i>Pendientes
+                <span class="badge bg-warning ms-1" th:text="${#lists.size(pendientes)}">0</span>
+            </button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link sp-tab" data-bs-toggle="tab" data-bs-target="#aprobados">
+                <i class="bi bi-check-circle-fill me-1"></i>Aprobados
+                <span class="badge bg-success ms-1" th:text="${#lists.size(aprobados)}">0</span>
+            </button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link sp-tab" data-bs-toggle="tab" data-bs-target="#rechazados">
+                <i class="bi bi-x-circle-fill me-1"></i>Rechazados
+                <span class="badge bg-danger ms-1" th:text="${#lists.size(rechazados)}">0</span>
+            </button>
+        </li>
+    </ul>
+
+    <div class="tab-content">
+        <!-- PENDIENTES -->
+        <div class="tab-pane fade show active" id="pendientes">
+            <div class="row g-3">
+                <div th:each="a : ${pendientes}" class="col-md-6 col-xl-4">
+                    <div class="sp-alumno-card sp-card-pending">
+                        <div class="sp-alumno-card-head">
+                            <div class="sp-avatar">
+                                <i class="bi bi-person-fill"></i>
+                            </div>
+                            <div>
+                                <div class="sp-alumno-name" th:text="${a.nombreCompleto}">Nombre</div>
+                                <div class="sp-alumno-code" th:text="${a.cedula}">Cédula</div>
+                            </div>
+                            <span class="badge bg-warning sp-status-badge ms-auto">Pendiente</span>
+                        </div>
+                        <div class="sp-alumno-info">
+                            <div class="sp-info-row">
+                                <i class="bi bi-building"></i>
+                                <span th:text="${a.facultadNombre != null ? a.facultadNombre : 'Sin facultad'}">Facultad</span>
+                            </div>
+                            <div class="sp-info-row">
+                                <i class="bi bi-book"></i>
+                                <span th:text="${a.programaAcademico}">Programa</span>
+                            </div>
+                            <div class="sp-info-row">
+                                <i class="bi bi-calendar3"></i>
+                                <span th:text="${a.semestre}">Semestre</span>
+                            </div>
+                        </div>
+                        <div class="sp-alumno-actions">
+                            <form th:action="@{/coordinacion/rechazar/{id}(id=${a.id})}" method="post" style="flex:1">
+                                <button type="submit" class="btn sp-btn-danger w-100"
+                                        onclick="return confirm('¿Rechazar esta solicitud?')">
+                                    <i class="bi bi-x-circle me-1"></i>Rechazar
+                                </button>
+                            </form>
+                            <form th:action="@{/coordinacion/aprobar/{id}(id=${a.id})}" method="post" style="flex:1">
+                                <button type="submit" class="btn sp-btn-success w-100">
+                                    <i class="bi bi-check-circle me-1"></i>Aprobar
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div th:if="${#lists.isEmpty(pendientes)}" class="col-12">
+                    <div class="sp-empty-state">
+                        <i class="bi bi-check2-all"></i>
+                        <p>No hay solicitudes pendientes</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- APROBADOS -->
+        <div class="tab-pane fade" id="aprobados">
+            <div class="sp-card">
+                <div class="sp-card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table sp-table mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Alumno</th><th>Cédula</th><th>Facultad</th>
+                                    <th>Fecha Aprobación</th><th>Aprobado Por</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="a : ${aprobados}">
+                                    <td th:text="${a.nombreCompleto}">-</td>
+                                    <td th:text="${a.cedula}">-</td>
+                                    <td th:text="${a.facultadNombre}">-</td>
+                                    <td th:text="${a.fechaAprobacion}">-</td>
+                                    <td th:text="${a.aprobadoPor}">-</td>
+                                </tr>
+                                <tr th:if="${#lists.isEmpty(aprobados)}">
+                                    <td colspan="5" class="text-center text-muted py-3">No hay aprobados</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RECHAZADOS -->
+        <div class="tab-pane fade" id="rechazados">
+            <div class="sp-card">
+                <div class="sp-card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table sp-table mb-0">
+                            <thead>
+                                <tr><th>Alumno</th><th>Cédula</th><th>Facultad</th><th>Estado</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="a : ${rechazados}">
+                                    <td th:text="${a.nombreCompleto}">-</td>
+                                    <td th:text="${a.cedula}">-</td>
+                                    <td th:text="${a.facultadNombre}">-</td>
+                                    <td><span class="badge bg-danger">Rechazado</span></td>
+                                </tr>
+                                <tr th:if="${#lists.isEmpty(rechazados)}">
+                                    <td colspan="4" class="text-center text-muted py-3">No hay rechazados</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</main>
+</div>
+
+
+<div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>

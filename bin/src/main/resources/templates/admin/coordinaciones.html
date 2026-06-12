@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Gestión de Coordinaciones')}"></head>
+<body class="sp-body">
+<div th:replace="~{fragments/layout :: sidebar}"></div>
+<div class="sp-main">
+<div th:replace="~{fragments/layout :: topbar}"></div>
+<main class="sp-content">
+
+    <div class="sp-page-header">
+        <div>
+            <h1 class="sp-page-title font-display"><i class="bi bi-diagram-3-fill me-2"></i>Gestión de Coordinaciones</h1>
+            <p class="sp-page-subtitle">Administración de coordinadores del proceso Saber Pro — UTS</p>
+        </div>
+        <button class="btn sp-btn-primary" data-bs-toggle="modal" data-bs-target="#modalCoord"
+                onclick="limpiarForm()">
+            <i class="bi bi-plus-circle-fill me-2"></i>Nueva Coordinación
+        </button>
+    </div>
+
+    <div th:if="${mensaje}" class="alert sp-alert" th:classappend="'alert-' + ${tipoMensaje}" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i>
+        <span th:text="${mensaje}"></span>
+        <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
+    </div>
+
+    <!-- Info box -->
+    <div class="alert sp-alert d-flex align-items-start gap-3 mb-4" style="border-radius:var(--sp-radius)">
+        <i class="bi bi-info-circle-fill fs-5 flex-shrink-0 mt-1"></i>
+        <div>
+            <strong>Rol Coordinación:</strong> Los coordinadores gestionan el CRUD de alumnos, aprueban inscripciones Saber Pro,
+            generan informes de alumnos (Total y Único), informes de beneficios y consultan resoluciones de Tecnología e Ingeniería.
+            <br/><small class="text-muted">Credenciales de acceso: Email institucional / Contraseña asignada</small>
+        </div>
+    </div>
+
+    <!-- Buscador -->
+    <div class="sp-card mb-4">
+        <div class="sp-card-body py-3">
+            <div class="input-group sp-input-group" style="max-width:400px">
+                <span class="input-group-text sp-input-icon"><i class="bi bi-search"></i></span>
+                <input type="text" id="tableSearch" class="form-control sp-form-control"
+                       placeholder="Buscar coordinación por nombre, cédula o email..."/>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla -->
+    <div class="sp-card">
+        <div class="sp-card-header">
+            <span><i class="bi bi-table me-2"></i>Lista de Coordinaciones</span>
+            <span class="badge sp-badge-count" th:text="${#lists.size(coordinaciones)} + ' registros'">0</span>
+        </div>
+        <div class="sp-card-body p-0">
+            <div class="table-responsive">
+                <table class="table sp-table sp-searchable mb-0">
+                    <thead>
+                        <tr>
+                            <th>Coordinador(a)</th>
+                            <th>Cédula</th>
+                            <th>Email</th>
+                            <th>Teléfono</th>
+                            <th class="text-center">Estado</th>
+                            <th class="text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="c : ${coordinaciones}">
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="sp-avatar sp-avatar-sm"
+                                         style="background:#dbeafe;color:#2563eb">
+                                        <i class="bi bi-diagram-3-fill"></i>
+                                    </div>
+                                    <div>
+                                        <div style="font-weight:600;font-size:13px" th:text="${c.nombreCompleto}">Nombre</div>
+                                        <div style="font-size:11px;color:var(--c-text2)">Coordinación Saber Pro</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td th:text="${c.cedula}">-</td>
+                            <td>
+                                <a th:href="'mailto:' + ${c.email}" style="color:#f97316;font-size:13px"
+                                   th:text="${c.email}">email</a>
+                            </td>
+                            <td th:text="${c.telefono != null and !c.telefono.isBlank() ? c.telefono : '—'}">-</td>
+                            <td class="text-center">
+                                <span th:if="${c.activo}" class="badge bg-success">Activo</span>
+                                <span th:unless="${c.activo}" class="badge bg-secondary">Inactivo</span>
+                            </td>
+                            <td class="text-center">
+                                <div class="sp-action-btns">
+                                    <a th:href="@{/admin/coordinaciones/editar/{id}(id=${c.id})}"
+                                       class="btn sp-btn-icon sp-btn-edit" title="Editar">
+                                        <i class="bi bi-pencil-fill"></i>
+                                    </a>
+                                    <a th:href="@{/admin/coordinaciones/eliminar/{id}(id=${c.id})}"
+                                       class="btn sp-btn-icon sp-btn-delete" title="Desactivar"
+                                       data-confirm="¿Desactivar esta coordinación?">
+                                        <i class="bi bi-trash-fill"></i>
+                                    </a>
+                                    <button type="button" class="btn sp-btn-icon sp-btn-view btn-reset-pwd"
+                                            title="Restablecer contraseña"
+                                            th:data-id="${c.id}"
+                                            th:data-nombre="${c.nombre}">
+                                        <i class="bi bi-key-fill"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(coordinaciones)}">
+                            <td colspan="6">
+                                <div class="sp-empty-state" style="padding:40px">
+                                    <i class="bi bi-inbox"></i>
+                                    <p>No hay coordinaciones registradas.<br/>
+                                       Haz clic en <strong>Nueva Coordinación</strong> para comenzar.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL -->
+    <div class="modal fade" id="modalCoord" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content sp-modal">
+                <div class="modal-header sp-modal-header">
+                    <h5 class="modal-title">
+                        <i class="bi bi-diagram-3-fill me-2"></i>
+                        <span id="modalTitulo">Nueva Coordinación</span>
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form th:action="@{/admin/coordinaciones/guardar}" th:object="${coordinacion}" method="post">
+                        <input type="hidden" th:field="*{id}"/>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="sp-form-label">Nombre *</label>
+                                <input type="text" th:field="*{nombre}" class="form-control sp-form-control"
+                                       placeholder="Nombre" required/>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="sp-form-label">Apellido *</label>
+                                <input type="text" th:field="*{apellido}" class="form-control sp-form-control"
+                                       placeholder="Apellido" required/>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="sp-form-label">Cédula *</label>
+                                <input type="text" th:field="*{cedula}" class="form-control sp-form-control"
+                                       placeholder="Número de cédula" required/>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="sp-form-label">Teléfono</label>
+                                <input type="text" th:field="*{telefono}" class="form-control sp-form-control"
+                                       placeholder="Ej: 3001234567"/>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="sp-form-label">Email institucional *</label>
+                                <input type="email" th:field="*{email}" class="form-control sp-form-control"
+                                       placeholder="coordinacion@uts.edu.co" required/>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="sp-form-label">
+                                    Contraseña
+                                    <span class="text-muted fw-normal small" th:if="${coordinacion.id != null}">
+                                        (vacío = mantener actual)
+                                    </span>
+                                </label>
+                                <input type="password" th:field="*{password}" class="form-control sp-form-control"
+                                       placeholder="••••••••"/>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-light border mt-3 mb-0" style="font-size:12px">
+                            <i class="bi bi-key me-1"></i>
+                            El coordinador podrá iniciar sesión con su <strong>email</strong> y la <strong>contraseña</strong> asignada.
+                        </div>
+
+                        <div class="d-flex gap-2 justify-content-end mt-4 pt-2 border-top">
+                            <button type="button" class="btn sp-btn-outline" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn sp-btn-primary">
+                                <i class="bi bi-save-fill me-2"></i>Guardar Coordinación
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</main>
+</div>
+
+<!-- Modal restablecer contraseña RF-06 -->
+<div class="modal fade" id="modalResetPwd" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content sp-modal">
+            <div class="modal-header sp-modal-header">
+                <h5 class="modal-title"><i class="bi bi-key-fill me-2"></i>Restablecer Contraseña</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <p class="text-muted mb-3">Coordinador: <strong id="resetNombre">-</strong></p>
+                <form id="resetForm" method="post">
+                    <div class="mb-3">
+                        <label class="sp-form-label">Nueva contraseña</label>
+                        <input type="password" id="nuevaPassword" name="nuevaPassword"
+                               class="form-control sp-form-control" placeholder="Mínimo 6 caracteres"/>
+                        <small class="text-muted">Si dejas vacío se usará la cédula como contraseña por defecto.</small>
+                    </div>
+                    <input type="hidden" name="returnUrl" value="/admin/coordinaciones"/>
+                    <div class="d-flex gap-2 justify-content-end">
+                        <button type="button" class="btn sp-btn-outline" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn sp-btn-primary">
+                            <i class="bi bi-key me-1"></i>Restablecer
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{fragments/layout :: scripts}"></div>
+<script th:inline="javascript">
+    // Abrir modal edición si hay coordinacion con id
+    const coordId = /*[[${coordinacion.id}]]*/ null;
+    if (coordId) {
+        document.getElementById('modalTitulo').textContent = 'Editar Coordinación';
+        new bootstrap.Modal(document.getElementById('modalCoord')).show();
+    }
+    function limpiarForm() {
+        document.getElementById('modalTitulo').textContent = 'Nueva Coordinación';
+    }
+
+    // RF-06: Reset password — usar data-* attributes en lugar de th:onclick
+    document.querySelectorAll('.btn-reset-pwd').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const id = this.dataset.id;
+            const nombre = this.dataset.nombre;
+            document.getElementById('resetNombre').textContent = nombre;
+            document.getElementById('resetForm').action = '/admin/usuarios/reset-password/' + id;
+            new bootstrap.Modal(document.getElementById('modalResetPwd')).show();
+        });
+    });
+</script>
+</body>
+</html>

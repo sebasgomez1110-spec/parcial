@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Saber Pro UTS')}">
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Gestión de Alumnos | Coordinación</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet"/>
+    <link th:href="@{/css/saberpro.css}" rel="stylesheet"/>
+</head>
+<body class="sp-body">
+<div th:replace="~{fragments/layout :: sidebar}"></div>
+<div class="sp-main">
+<div th:replace="~{fragments/layout :: topbar}"></div>
+<main class="sp-content">
+
+    <div class="sp-page-header">
+        <div>
+            <h1 class="sp-page-title font-display"><i class="bi bi-person-lines-fill me-2"></i>Gestión de Alumnos</h1>
+            <p class="sp-page-subtitle">CRUD Total y Único — Administración de estudiantes Saber Pro</p>
+        </div>
+        <button class="btn sp-btn-primary" data-bs-toggle="modal" data-bs-target="#modalAlumno"
+                onclick="limpiarFormulario()">
+            <i class="bi bi-plus-circle-fill me-2"></i>Nuevo Alumno
+        </button>
+    </div>
+
+    <div th:if="${mensaje}" class="alert sp-alert"
+         th:classappend="'alert-' + ${tipoMensaje}" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i>
+        <span th:text="${mensaje}"></span>
+        <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
+    </div>
+
+    <!-- Nota de credenciales estudiante -->
+    <div class="alert sp-alert d-flex align-items-start gap-3 mb-3" style="border-radius:var(--sp-radius)">
+        <i class="bi bi-key-fill fs-5 flex-shrink-0"></i>
+        <div>
+            <strong>Credenciales automáticas para el estudiante:</strong>
+            El sistema crea automáticamente un usuario de acceso para cada estudiante registrado.
+            <br/><span class="small">Usuario: <code>email institucional</code> — Contraseña: <code>número de cédula</code></span>
+        </div>
+    </div>
+
+    <!-- Buscador + filtro -->
+    <div class="sp-card mb-4">
+        <div class="sp-card-body py-3">
+            <div class="d-flex gap-3 flex-wrap align-items-center">
+                <div class="input-group sp-input-group" style="max-width:360px">
+                    <span class="input-group-text sp-input-icon"><i class="bi bi-search"></i></span>
+                    <input type="text" id="tableSearch" class="form-control sp-form-control"
+                           placeholder="Buscar por nombre, cédula, facultad..."/>
+                </div>
+                <select id="filtroEstado" class="form-select sp-form-control" style="max-width:200px"
+                        onchange="filtrarEstado(this.value)">
+                    <option value="">Todos los estados</option>
+                    <option value="PENDIENTE">Pendiente</option>
+                    <option value="APROBADO">Aprobado</option>
+                    <option value="RECHAZADO">Rechazado</option>
+                    <option value="PAGADO">Pagado</option>
+                    <option value="PRESENTADO">Presentado</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla alumnos -->
+    <div class="sp-card">
+        <div class="sp-card-header">
+            <h5><i class="bi bi-table me-2"></i>Lista de Alumnos Registrados</h5>
+            <span class="badge sp-badge-count"
+                  th:text="${#lists.size(alumnos)} + ' alumnos'">0</span>
+        </div>
+        <div class="sp-card-body p-0">
+            <div class="table-responsive">
+                <table class="table sp-table sp-searchable mb-0" id="tablaAlumnos">
+                    <thead>
+                        <tr>
+                            <th>Alumno</th>
+                            <th>Cédula</th>
+                            <th>Facultad</th>
+                            <th>Programa</th>
+                            <th>Semestre</th>
+                            <th>Estado SP</th>
+                            <th>Beneficio</th>
+                            <th class="text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="a : ${alumnos}" th:attr="data-estado=${a.estadoSaberPro}">
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="sp-avatar sp-avatar-sm">
+                                        <i class="bi bi-person-fill"></i>
+                                    </div>
+                                    <div>
+                                        <div style="font-weight:600;font-size:13px"
+                                             th:text="${a.nombreCompleto}">Nombre</div>
+                                        <div style="font-size:11px;color:var(--c-text2)"
+                                             th:text="${a.email}">email</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td th:text="${a.cedula}">-</td>
+                            <td th:text="${a.facultadNombre}">-</td>
+                            <td th:text="${a.programaAcademico}">-</td>
+                            <td th:text="${a.semestre}">-</td>
+                            <td>
+                                <span class="badge"
+                                      th:classappend="${a.estadoSaberPro == 'APROBADO'   ? ' bg-success' :
+                                                       a.estadoSaberPro == 'PENDIENTE'  ? ' bg-warning text-dark' :
+                                                       a.estadoSaberPro == 'RECHAZADO'  ? ' bg-danger' :
+                                                       a.estadoSaberPro == 'PAGADO'     ? ' bg-info' :
+                                                       a.estadoSaberPro == 'PRESENTADO' ? ' bg-primary' : ' bg-secondary'}"
+                                      th:text="${a.estadoSaberPro}">Estado</span>
+                            </td>
+                            <td>
+                                <span th:if="${a.tieneBeneficio}" class="badge bg-success">
+                                    <i class="bi bi-award me-1"></i>Sí
+                                </span>
+                                <span th:unless="${a.tieneBeneficio}" class="text-muted" style="font-size:12px">No</span>
+                            </td>
+                            <td class="text-center">
+                                <div class="sp-action-btns">
+                                    <a th:href="@{/coordinacion/alumnos/editar/{id}(id=${a.id})}"
+                                       class="btn sp-btn-icon sp-btn-edit" title="Editar">
+                                        <i class="bi bi-pencil-fill"></i>
+                                    </a>
+                                    <a th:href="@{/coordinacion/alumnos/eliminar/{id}(id=${a.id})}"
+                                       class="btn sp-btn-icon sp-btn-delete" title="Eliminar"
+                                       data-confirm="¿Eliminar este alumno?">
+                                        <i class="bi bi-trash-fill"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(alumnos)}">
+                            <td colspan="8">
+                                <div class="sp-empty-state" style="padding:40px">
+                                    <i class="bi bi-inbox"></i>
+                                    <p>No hay alumnos registrados aún.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL FORMULARIO ALUMNO -->
+    <div class="modal fade" id="modalAlumno" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content sp-modal">
+                <div class="modal-header sp-modal-header">
+                    <h5 class="modal-title">
+                        <i class="bi bi-person-fill me-2"></i>
+                        <span th:text="${alumno.id != null ? 'Editar Alumno' : 'Registrar Nuevo Alumno'}">Alumno</span>
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form th:action="@{/coordinacion/alumnos/guardar}" th:object="${alumno}" method="post">
+                        <input type="hidden" th:field="*{id}"/>
+
+                        <!-- ── Datos Personales ─────────────────────────────────── -->
+                        <div class="sp-form-section mb-4">
+                            <div class="sp-form-section-title">
+                                <i class="bi bi-person-fill me-2"></i>Datos Personales
+                            </div>
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label class="sp-form-label">Nombre *</label>
+                                    <input type="text" th:field="*{nombre}" class="form-control sp-form-control"
+                                           placeholder="Nombre" required/>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="sp-form-label">Apellido *</label>
+                                    <input type="text" th:field="*{apellido}" class="form-control sp-form-control"
+                                           placeholder="Apellido" required/>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="sp-form-label">Cédula * <small class="text-muted fw-normal">(será la contraseña)</small></label>
+                                    <input type="text" th:field="*{cedula}" class="form-control sp-form-control"
+                                           placeholder="Número de cédula" required
+                                           oninput="sincronizarPassword(this.value)"/>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="sp-form-label">Email institucional</label>
+                                    <input type="email" th:field="*{email}" class="form-control sp-form-control"
+                                           placeholder="correo@uts.edu.co"/>
+                                    <small class="text-muted">Si vacío se genera automáticamente</small>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="sp-form-label">Teléfono</label>
+                                    <input type="text" th:field="*{telefono}" class="form-control sp-form-control"
+                                           placeholder="Ej: 3001234567"/>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="sp-form-label">Fecha de Nacimiento</label>
+                                    <input type="date" th:field="*{fechaNacimiento}" class="form-control sp-form-control"/>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ── Credenciales de acceso ──────────────────────────── -->
+                        <div class="sp-form-section mb-4" style="background:#fffbeb;border-color:#fbbf24">
+                            <div class="sp-form-section-title" style="color:#92400e">
+                                <i class="bi bi-key-fill me-2"></i>Credenciales de Acceso al Sistema
+                            </div>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="sp-form-label">Contraseña del estudiante *</label>
+                                    <div class="input-group sp-input-group">
+                                        <span class="input-group-text sp-input-icon"><i class="bi bi-lock-fill"></i></span>
+                                        <input type="text" id="passwordEstudiante" name="passwordEstudiante"
+                                               class="form-control sp-form-control"
+                                               placeholder="Se llenará automáticamente con la cédula"
+                                               th:value="${alumno.cedula}"/>
+                                    </div>
+                                    <small class="text-muted">Por defecto es la cédula. Puedes cambiarla.</small>
+                                </div>
+                                <div class="col-md-6 d-flex align-items-center">
+                                    <div class="alert sp-alert mb-0 py-2 px-3" style="font-size:12px;border-radius:8px">
+                                        <i class="bi bi-info-circle me-1"></i>
+                                        El estudiante inicia sesión con su <strong>email</strong> y esta <strong>contraseña</strong>.
+                                        Si el email queda vacío, se genera como <code>nombre.APELLIDO@uts.edu.co</code>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ── Datos Académicos ────────────────────────────────── -->
+                        <div class="sp-form-section mb-4">
+                            <div class="sp-form-section-title">
+                                <i class="bi bi-mortarboard-fill me-2"></i>Datos Académicos
+                            </div>
+                            <div class="row g-3">
+                                <!-- Selector de ÁREA -->
+                                <div class="col-md-3">
+                                    <label class="sp-form-label">Área *</label>
+                                    <select id="selectArea" class="form-select sp-form-control" onchange="filtrarFacultadesPorArea(this.value)" required>
+                                        <option value="">— Seleccionar área —</option>
+                                        <option value="TECNOLOGIA">💻 Tecnología</option>
+                                        <option value="INGENIERIA">⚙️ Ingeniería</option>
+                                        <option value="ADMINISTRATIVA">💼 Administrativa</option>
+                                        <option value="DEPORTES">🏃 Deportes</option>
+                                    </select>
+                                </div>
+                                <!-- Selector de FACULTAD filtrado por área -->
+                                <div class="col-md-5">
+                                    <label class="sp-form-label">Facultad *</label>
+                                    <select th:field="*{facultadId}" id="selectFacultad"
+                                            class="form-select sp-form-control" required
+                                            onchange="onFacultadChange(this)">
+                                        <option value="">— Primero selecciona un área —</option>
+                                        <option th:each="f : ${facultades}"
+                                                th:value="${f.id}"
+                                                th:text="${f.nombre}"
+                                                th:attr="data-area=${f.directorNombre}">Facultad</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="sp-form-label">Semestre</label>
+                                    <select th:field="*{semestre}" class="form-select sp-form-control">
+                                        <option value="">—</option>
+                                        <option th:each="s : ${#numbers.sequence(1,10)}"
+                                                th:value="${s}" th:text="${s + '°'}">s</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="sp-form-label">Código Estudiante</label>
+                                    <input type="text" th:field="*{codigoEstudiante}"
+                                           class="form-control sp-form-control" placeholder="Código"/>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ── Beneficio ───────────────────────────────────────── -->
+                        <div class="sp-form-section">
+                            <div class="sp-form-section-title">
+                                <i class="bi bi-award-fill me-2"></i>Beneficio Académico
+                            </div>
+                            <div class="row g-3">
+                                <div class="col-md-3">
+                                    <label class="sp-form-label">¿Tiene Beneficio?</label>
+                                    <div class="form-check form-switch mt-2">
+                                        <input class="form-check-input" type="checkbox"
+                                               th:field="*{tieneBeneficio}" role="switch"
+                                               id="switchBeneficio"
+                                               onchange="toggleBeneficio(this.checked)"/>
+                                        <label class="form-check-label fw-600">Sí</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-5" id="divTipoBeneficio"
+                                     th:style="${alumno.tieneBeneficio ? '' : 'opacity:.4;pointer-events:none'}">
+                                    <label class="sp-form-label">Tipo de Beneficio</label>
+                                    <select th:field="*{tipoBeneficio}" class="form-select sp-form-control">
+                                        <option value="">— Sin beneficio —</option>
+                                        <!-- Resolución 001 - Tecnología -->
+                                        <option value="DESCUENTO_MATRICULA_30"
+                                                th:selected="${alumno.tipoBeneficio == 'DESCUENTO_MATRICULA_30'}">
+                                            RES-001 — Descuento 30% Matrícula (Tecnología, puntaje ≥ 160)
+                                        </option>
+                                        <!-- Resolución 002 - Ingeniería -->
+                                        <option value="DESCUENTO_MATRICULA_25"
+                                                th:selected="${alumno.tipoBeneficio == 'DESCUENTO_MATRICULA_25'}">
+                                            RES-002 — Descuento 25% Matrícula (Ingeniería, puntaje ≥ 150)
+                                        </option>
+                                        <!-- Resolución 003 - Bilingüismo -->
+                                        <option value="RECONOCIMIENTO"
+                                                th:selected="${alumno.tipoBeneficio == 'RECONOCIMIENTO'}">
+                                            RES-003 — Reconocimiento Bilingüismo (Inglés B1 o superior)
+                                        </option>
+                                        <!-- Compatibilidad con valores anteriores -->
+                                        <option value="DESCUENTO_MATRICULA"
+                                                th:if="${alumno.tipoBeneficio == 'DESCUENTO_MATRICULA'}"
+                                                th:selected="true">
+                                            Descuento Matrícula
+                                        </option>
+                                    </select>
+                                </div>
+                                <!-- Descripción dinámica del beneficio -->
+                                <div class="col-md-4" id="divBeneficioInfo" style="display:none">
+                                    <div id="beneficioDesc" class="p-3 rounded" style="font-size:12px;background:rgba(249,115,22,.15);border:1px solid #6ee7b7">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-2 justify-content-end mt-4 pt-2 border-top">
+                            <button type="button" class="btn sp-btn-outline" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn sp-btn-primary">
+                                <i class="bi bi-save-fill me-2"></i>Guardar Alumno
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        // ── Abrir modal edición ────────────────────────────────────────────
+        const alumnoId = /*[[${alumno.id}]]*/ null;
+        const alumnoArea = /*[[${alumno.facultadId != null ? 'LOADED' : ''}]]*/ '';
+        if (alumnoId) {
+            // Pre-seleccionar área al editar
+            const selFac = document.getElementById('selectFacultad');
+            const selectedOpt = selFac?.options[selFac.selectedIndex];
+            if (selectedOpt) {
+                const area = selectedOpt.dataset.area;
+                if (area) {
+                    document.getElementById('selectArea').value = area;
+                    filtrarFacultadesPorArea(area, true);
+                }
+            }
+            new bootstrap.Modal(document.getElementById('modalAlumno')).show();
+        }
+
+        // ── Sincronizar cédula → contraseña ───────────────────────────────
+        function sincronizarPassword(val) {
+            const pwd = document.getElementById('passwordEstudiante');
+            if (pwd && !pwd.dataset.editado) pwd.value = val;
+        }
+        document.getElementById('passwordEstudiante')?.addEventListener('input', function() {
+            this.dataset.editado = 'true';
+        });
+
+        // ── Filtrar facultades por área ────────────────────────────────────
+        function filtrarFacultadesPorArea(area, mantenerSeleccion) {
+            const sel = document.getElementById('selectFacultad');
+            const opts = sel.querySelectorAll('option');
+            let hayOpciones = false;
+            opts.forEach(opt => {
+                if (!opt.value) {
+                    opt.style.display = '';
+                    opt.textContent = area ? '— Seleccionar facultad —' : '— Primero selecciona un área —';
+                    return;
+                }
+                const match = !area || opt.dataset.area === area;
+                opt.style.display = match ? '' : 'none';
+                if (match) hayOpciones = true;
+            });
+            if (!mantenerSeleccion) {
+                sel.value = '';
+                document.getElementById('divBeneficioInfo').style.display = 'none';
+            }
+            // Actualizar tipos de beneficio sugeridos según área
+            actualizarBeneficiosPorArea(area);
+        }
+
+        // ── Al cambiar facultad ────────────────────────────────────────────
+        function onFacultadChange(sel) {
+            const opt = sel.options[sel.selectedIndex];
+            // No hace nada extra por ahora, el área ya filtra
+        }
+
+        // ── Sugerir beneficios según área ──────────────────────────────────
+        function actualizarBeneficiosPorArea(area) {
+            const sel = document.getElementById('selectFacultad')?.closest('form')
+                        ?.querySelector('[name="tipoBeneficio"]');
+            if (!sel) return;
+            const opts = sel.querySelectorAll('option');
+            opts.forEach(o => {
+                if (!o.value) { o.style.display = ''; return; }
+                if (area === 'TECNOLOGIA') {
+                    o.style.display = (o.value === 'DESCUENTO_MATRICULA_30' || o.value === 'RECONOCIMIENTO' || o.value === 'DESCUENTO_MATRICULA') ? '' : 'none';
+                } else if (area === 'INGENIERIA') {
+                    o.style.display = (o.value === 'DESCUENTO_MATRICULA_25' || o.value === 'RECONOCIMIENTO' || o.value === 'DESCUENTO_MATRICULA') ? '' : 'none';
+                } else {
+                    o.style.display = '';
+                }
+            });
+        }
+
+        // ── Toggle beneficio ───────────────────────────────────────────────
+        function toggleBeneficio(checked) {
+            const div = document.getElementById('divTipoBeneficio');
+            div.style.opacity = checked ? '1' : '.4';
+            div.style.pointerEvents = checked ? '' : 'none';
+            if (!checked) {
+                const sel = div.querySelector('select');
+                if (sel) sel.value = '';
+            }
+        }
+
+        // ── Filtrar tabla alumnos ──────────────────────────────────────────
+        function filtrarEstado(estado) {
+            document.querySelectorAll('#tablaAlumnos tbody tr').forEach(row => {
+                row.style.display = (!estado || row.dataset.estado === estado) ? '' : 'none';
+            });
+        }
+
+        // ── Limpiar modal al abrir como nuevo ─────────────────────────────
+        document.getElementById('modalAlumno')?.addEventListener('show.bs.modal', function(e) {
+            if (!alumnoId) {
+                document.getElementById('selectArea').value = '';
+                filtrarFacultadesPorArea('');
+            }
+        });
+    </script>
+
+
+</main>
+</div>
+
+
+<div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<!-- ========== HEAD ========== -->
+<head th:fragment="head(pageTitle)">
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title th:text="${pageTitle} + ' | Saber Pro UTS'">Sistema Saber Pro — UTS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&amp;family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&amp;display=swap" rel="stylesheet"/>
+    <link th:href="@{/css/saberpro.css}" rel="stylesheet"/>
+</head>
+
+<!-- ========== SIDEBAR ========== -->
+<div th:fragment="sidebar" id="sidebar" class="sp-sidebar">
+
+    <!-- Logo -->
+    <div class="sp-sidebar-brand" title="Saber Pro UTS">
+        <i class="bi bi-mortarboard-fill" style="font-size:20px"></i>
+    </div>
+
+    <nav class="sp-sidebar-nav">
+
+        <!-- ADMIN -->
+        <div th:if="${session.usuarioRol == 'ADMIN'}">
+            <div class="sp-nav-section">Admin</div>
+            <a th:href="@{/admin/dashboard}" class="sp-nav-link" title="Dashboard">
+                <i class="bi bi-grid-fill"></i><span>Dashboard</span>
+            </a>
+            <a th:href="@{/admin/coordinaciones}" class="sp-nav-link" title="Coordinaciones">
+                <i class="bi bi-diagram-3-fill"></i><span>Coordinaciones</span>
+            </a>
+            <a th:href="@{/admin/docentes}" class="sp-nav-link" title="Docentes">
+                <i class="bi bi-people-fill"></i><span>Docentes</span>
+            </a>
+            <a th:href="@{/admin/facultades}" class="sp-nav-link" title="Facultades">
+                <i class="bi bi-building-fill"></i><span>Facultades</span>
+            </a>
+            <a th:href="@{/admin/resoluciones}" class="sp-nav-link" title="Resoluciones">
+                <i class="bi bi-file-earmark-text-fill"></i><span>Resoluciones</span>
+            </a>
+        </div>
+
+        <!-- COORDINACIÓN -->
+        <div th:if="${session.usuarioRol == 'COORDINACION'}">
+            <div class="sp-nav-section">Coordinación</div>
+            <a th:href="@{/coordinacion/dashboard}" class="sp-nav-link" title="Dashboard">
+                <i class="bi bi-speedometer2"></i><span>Dashboard</span>
+            </a>
+            <a th:href="@{/coordinacion/alumnos}" class="sp-nav-link" title="Estudiantes">
+                <i class="bi bi-person-lines-fill"></i><span>Estudiantes</span>
+            </a>
+            <a th:href="@{/coordinacion/aprobar}" class="sp-nav-link" title="Aprobar Saber Pro">
+                <i class="bi bi-check-circle-fill"></i><span>Aprobar</span>
+            </a>
+            <a th:href="@{/coordinacion/informe/alumnos}" class="sp-nav-link" title="Informe Estudiantes">
+                <i class="bi bi-bar-chart-fill"></i><span>Informe Est.</span>
+            </a>
+            <a th:href="@{/coordinacion/informe/beneficios}" class="sp-nav-link" title="Informe Beneficios">
+                <i class="bi bi-award-fill"></i><span>Beneficios</span>
+            </a>
+            <a th:href="@{/coordinacion/resoluciones}" class="sp-nav-link" title="Resoluciones">
+                <i class="bi bi-file-earmark-ruled-fill"></i><span>Resoluciones</span>
+            </a>
+        </div>
+
+        <!-- DOCENTE -->
+        <div th:if="${session.usuarioRol == 'DOCENTE'}">
+            <div class="sp-nav-section">Docente</div>
+            <a th:href="@{/docente/dashboard}" class="sp-nav-link" title="Dashboard">
+                <i class="bi bi-house-fill"></i><span>Dashboard</span>
+            </a>
+            <a th:href="@{/docente/alumnos/cedula}" class="sp-nav-link" title="Buscar por Cédula">
+                <i class="bi bi-search"></i><span>Buscar Cédula</span>
+            </a>
+            <a th:href="@{/docente/informe/alumnos}" class="sp-nav-link" title="Informe Estudiantes">
+                <i class="bi bi-table"></i><span>Informe Est.</span>
+            </a>
+            <a th:href="@{/docente/informe/beneficios}" class="sp-nav-link" title="Informe Beneficios">
+                <i class="bi bi-award-fill"></i><span>Beneficios</span>
+            </a>
+            <a th:href="@{/docente/resoluciones}" class="sp-nav-link" title="Resoluciones">
+                <i class="bi bi-file-earmark-ruled-fill"></i><span>Resoluciones</span>
+            </a>
+        </div>
+
+        <!-- ESTUDIANTE -->
+        <div th:if="${session.usuarioRol == 'ESTUDIANTE'}">
+            <div class="sp-nav-section">Mi Saber Pro</div>
+            <a th:href="@{/estudiante/dashboard}" class="sp-nav-link" title="Inicio">
+                <i class="bi bi-house-fill"></i><span>Inicio</span>
+            </a>
+            <a th:href="@{/estudiante/identificacion}" class="sp-nav-link" title="Mi Identificación">
+                <i class="bi bi-person-fill"></i><span>Identificación</span>
+            </a>
+            <a th:href="@{/estudiante/pago}" class="sp-nav-link" title="Cargue de Pago">
+                <i class="bi bi-receipt"></i><span>Pago</span>
+            </a>
+            <a th:href="@{/estudiante/resultado/unico}" class="sp-nav-link" title="Resultado Único">
+                <i class="bi bi-clipboard-data-fill"></i><span>Resultado</span>
+            </a>
+            <a th:href="@{/estudiante/resultado/total}" class="sp-nav-link" title="Resultados Total">
+                <i class="bi bi-clipboard2-check-fill"></i><span>Histórico</span>
+            </a>
+            <a th:href="@{/estudiante/resoluciones}" class="sp-nav-link" title="Beneficios">
+                <i class="bi bi-award-fill"></i><span>Beneficios</span>
+            </a>
+        </div>
+
+    </nav>
+
+    <div class="sp-sidebar-footer">
+        <a th:href="@{/logout}" class="sp-nav-link" title="Cerrar sesión" style="color:var(--c-danger)">
+            <i class="bi bi-box-arrow-left"></i><span>Salir</span>
+        </a>
+    </div>
+</div>
+
+<!-- ========== TOPBAR ========== -->
+<header th:fragment="topbar" class="sp-topbar">
+    <button class="sp-toggle-btn" id="sidebarToggle" aria-label="Toggle sidebar">
+        <i class="bi bi-layout-sidebar-inset"></i>
+    </button>
+    <div class="sp-topbar-breadcrumb">
+        <span>Sistema</span> <span style="margin:0 6px;opacity:.3">/</span>
+        <strong th:text="${session.usuarioRol == 'ADMIN' ? 'Administración' :
+                           session.usuarioRol == 'COORDINACION' ? 'Coordinación' :
+                           session.usuarioRol == 'DOCENTE' ? 'Docente' : 'Mi Portal'}">Portal</strong>
+    </div>
+    <div class="sp-topbar-right">
+        <div class="sp-user-chip">
+            <div class="sp-user-avatar"
+                 th:classappend="${session.usuarioRol == 'ADMIN'        ? 'sp-av-admin'  :
+                                   session.usuarioRol == 'COORDINACION' ? 'sp-av-coord'  :
+                                   session.usuarioRol == 'DOCENTE'      ? 'sp-av-doc'    :
+                                                                           'sp-av-est'}">
+                <i class="bi bi-person-fill"></i>
+            </div>
+            <div>
+                <div class="sp-user-name"
+                     th:text="${session.usuarioNombre != null ? session.usuarioNombre : 'Usuario'}">Usuario</div>
+                <div class="sp-user-role"
+                     th:text="${session.usuarioRol == 'ADMIN'        ? 'Administrador'  :
+                                 session.usuarioRol == 'COORDINACION' ? 'Coordinación'   :
+                                 session.usuarioRol == 'DOCENTE'      ? 'Docente'        :
+                                 session.usuarioRol == 'ESTUDIANTE'   ? 'Estudiante'     :
+                                                                          session.usuarioRol}">ROL</div>
+            </div>
+        </div>
+        <a th:href="@{/logout}" class="sp-btn-ghost btn-sm" title="Cerrar sesión">
+            <i class="bi bi-box-arrow-right"></i>
+        </a>
+    </div>
+</header>
+
+<!-- ========== SCRIPTS ========== -->
+<div th:fragment="scripts">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script th:src="@{/js/saberpro.js}"></script>
+</div>
+
+</html>

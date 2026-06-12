@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Mi Identificación')}"></head>
+<body class="sp-body">
+<div th:replace="~{fragments/layout :: sidebar}"></div>
+<div class="sp-main">
+<div th:replace="~{fragments/layout :: topbar}"></div>
+<main class="sp-content">
+
+    <div class="sp-page-header">
+        <div>
+            <h1 class="sp-page-title font-display"><i class="bi bi-person-vcard-fill me-2"></i>Mi Identificación</h1>
+            <p class="sp-page-subtitle">Datos personales y académicos registrados en el sistema</p>
+        </div>
+        <a th:href="@{/estudiante/dashboard}" class="btn sp-btn-outline">
+            <i class="bi bi-arrow-left me-1"></i>Volver
+        </a>
+    </div>
+
+    <div th:if="${alumno == null}" class="sp-card p-5 text-center">
+        <i class="bi bi-person-x-fill" style="font-size:3rem;color:var(--c-text2)"></i>
+        <h5 class="mt-3">No encontramos tu registro académico</h5>
+        <p class="text-muted">Comunícate con la coordinación.</p>
+    </div>
+
+    <div th:if="${alumno != null}">
+        <!-- Card principal de identificación -->
+        <div class="sp-card mb-4">
+            <div class="sp-card-body">
+                <div class="d-flex align-items-center gap-4 mb-4 pb-4" style="border-bottom:1px solid var(--sp-border-soft)">
+                    <div style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#f97316,var(--sp-primary-dark));display:flex;align-items:center;justify-content:center;font-size:36px;color:#fff;flex-shrink:0">
+                        <i class="bi bi-person-fill"></i>
+                    </div>
+                    <div>
+                        <h3 style="font-weight:800;color:#f97316;margin:0" th:text="${alumno.nombreCompleto}">Nombre</h3>
+                        <p class="text-muted mb-1" th:text="${alumno.facultadNombre}">Carrera</p>
+                        <span class="badge bg-success" th:if="${alumno.activo}">Activo</span>
+                        <span class="badge bg-danger" th:unless="${alumno.activo}">Inactivo</span>
+                        <span class="badge ms-1"
+                              th:classappend="${alumno.estadoSaberPro == 'APROBADO' ? 'bg-success' :
+                                               alumno.estadoSaberPro == 'PENDIENTE' ? 'bg-warning text-dark' :
+                                               alumno.estadoSaberPro == 'PAGADO' ? 'bg-info' : 'bg-secondary'}"
+                              th:text="'Saber Pro: ' + ${alumno.estadoSaberPro}">Estado</span>
+                    </div>
+                </div>
+
+                <div class="row g-4">
+                    <!-- Datos personales -->
+                    <div class="col-md-6">
+                        <h6 style="font-weight:700;color:#f97316;text-transform:uppercase;font-size:11px;letter-spacing:.08em;margin-bottom:16px">
+                            <i class="bi bi-person-fill me-2"></i>Datos Personales
+                        </h6>
+                        <div class="sp-info-grid">
+                            <div class="sp-info-row"><span class="sp-info-lbl">Primer Nombre</span><span th:text="${alumno.nombre}">-</span></div>
+                            <div class="sp-info-row"><span class="sp-info-lbl">Apellido</span><span th:text="${alumno.apellido}">-</span></div>
+                            <div class="sp-info-row"><span class="sp-info-lbl">N° Cédula</span><span th:text="${alumno.cedula}">-</span></div>
+                            <div class="sp-info-row"><span class="sp-info-lbl">Email</span><span th:text="${alumno.email}">-</span></div>
+                            <div class="sp-info-row"><span class="sp-info-lbl">Teléfono</span><span th:text="${alumno.telefono ?: 'No registrado'}">-</span></div>
+                            <div class="sp-info-row"><span class="sp-info-lbl">Fecha Nacimiento</span>
+                                <span th:text="${alumno.fechaNacimiento != null ? #temporals.format(alumno.fechaNacimiento,'dd/MM/yyyy') : 'No registrada'}">-</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Datos académicos -->
+                    <div class="col-md-6">
+                        <h6 style="font-weight:700;color:#f97316;text-transform:uppercase;font-size:11px;letter-spacing:.08em;margin-bottom:16px">
+                            <i class="bi bi-mortarboard-fill me-2"></i>Datos Académicos
+                        </h6>
+                        <div class="sp-info-grid">
+                            <div class="sp-info-row"><span class="sp-info-lbl">Carrera</span><span th:text="${alumno.facultadNombre}">-</span></div>
+                            <div class="sp-info-row"><span class="sp-info-lbl">Programa</span><span th:text="${alumno.programaAcademico}">-</span></div>
+                            <div class="sp-info-row"><span class="sp-info-lbl">Semestre</span><span th:text="${alumno.semestre + '°'}">-</span></div>
+                            <div class="sp-info-row"><span class="sp-info-lbl">Código Estudiante</span><span th:text="${alumno.codigoEstudiante}">-</span></div>
+                            <div class="sp-info-row"><span class="sp-info-lbl">Estado Saber Pro</span>
+                                <span class="badge"
+                                      th:classappend="${alumno.estadoSaberPro == 'APROBADO' ? 'bg-success' :
+                                                       alumno.estadoSaberPro == 'PENDIENTE' ? 'bg-warning text-dark' : 'bg-secondary'}"
+                                      th:text="${alumno.estadoSaberPro}">-</span>
+                            </div>
+                            <div class="sp-info-row"><span class="sp-info-lbl">Aprobado por</span>
+                                <span th:text="${alumno.aprobadoPorCoordinacion ? 'Coordinación ✓' : 'Pendiente'}">-</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Beneficio -->
+                    <div class="col-12" th:if="${alumno.tieneBeneficio}">
+                        <div style="background:rgba(249,115,22,.15);border:1.5px solid #6ee7b7;border-radius:var(--sp-radius);padding:16px;display:flex;align-items:center;gap:14px">
+                            <i class="bi bi-award-fill" style="font-size:2rem;color:#f97316"></i>
+                            <div>
+                                <div style="font-weight:700;color:#f97316">Beneficio Académico Asignado</div>
+                                <div class="text-muted" th:text="${alumno.tipoBeneficio}">tipo</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Credenciales de acceso -->
+        <div class="sp-card">
+            <div class="sp-card-header"><span><i class="bi bi-key-fill me-2"></i>Credenciales de Acceso al Sistema</span></div>
+            <div class="sp-card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div style="background:#f0fdf4;border:1px solid #d1fae5;border-radius:8px;padding:14px">
+                            <div style="font-size:11px;font-weight:700;color:#f97316;text-transform:uppercase;margin-bottom:4px">Email (usuario)</div>
+                            <div style="font-weight:600;font-size:14px" th:text="${alumno.email}">correo@uts.edu.co</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div style="background:#f0fdf4;border:1px solid #d1fae5;border-radius:8px;padding:14px">
+                            <div style="font-size:11px;font-weight:700;color:#f97316;text-transform:uppercase;margin-bottom:4px">Contraseña</div>
+                            <div style="font-weight:600;font-size:14px" th:text="${alumno.cedula}">contraseña</div>
+                            <div style="font-size:11px;color:var(--c-text2);margin-top:4px">Tu número de cédula es tu contraseña</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</main>
+</div>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+<style>
+.sp-info-grid{display:flex;flex-direction:column;gap:10px}
+.sp-info-row{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:#f9fafb;border-radius:8px;font-size:13px}
+.sp-info-lbl{font-weight:600;color:var(--c-text2);font-size:12px}
+</style>
+</body>
+</html>

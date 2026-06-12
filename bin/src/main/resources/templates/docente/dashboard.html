@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Dashboard — Docente')}"></head>
+<body class="sp-body">
+<div th:replace="~{fragments/layout :: sidebar}"></div>
+<div class="sp-main">
+<div th:replace="~{fragments/layout :: topbar}"></div>
+<main class="sp-content">
+
+    <!-- HEADER -->
+    <div class="sp-page-header">
+        <div>
+            <h1 class="sp-page-title font-display"><i class="bi bi-person-video3 me-2" style="color:#d97706"></i>Panel Docente</h1>
+            <p class="sp-page-subtitle">Consulta de estudiantes y resultados Saber Pro — UTS</p>
+        </div>
+        <div style="background:linear-gradient(135deg,#fef3c7,#fde68a);border:1.5px solid #fbbf24;border-radius:20px;padding:8px 20px;font-size:13px;font-weight:700;color:#78350f;display:flex;align-items:center;gap:8px">
+            <i class="bi bi-person-video3 me-1"></i>Docente
+        </div>
+    </div>
+
+    <!-- MÉTRICAS -->
+    <div class="row g-4 mb-4">
+        <div class="col-6 col-md-4">
+            <div class="sp-metric-card sp-metric-warn">
+                <div class="sp-metric-icon"><i class="bi bi-people-fill"></i></div>
+                <div>
+                    <div class="sp-metric-val" th:text="${totalAlumnos}">0</div>
+                    <div class="sp-metric-lbl">Total Estudiantes</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-4">
+            <div class="sp-metric-card sp-metric-green">
+                <div class="sp-metric-icon"><i class="bi bi-check-circle-fill"></i></div>
+                <div>
+                    <div class="sp-metric-val" th:text="${aprobados}">0</div>
+                    <div class="sp-metric-lbl">Aprobados SP</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-4">
+            <div class="sp-metric-card sp-metric-blue">
+                <div class="sp-metric-icon"><i class="bi bi-building-fill"></i></div>
+                <div>
+                    <div class="sp-metric-val" th:text="${#lists.size(facultades)}">0</div>
+                    <div class="sp-metric-lbl">Facultades activas</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ACCESOS RÁPIDOS — los 5 módulos del docente -->
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-4 col-lg">
+            <a th:href="@{/docente/alumnos/cedula}" class="sp-doc-card" style="border-color:#fbbf24">
+                <div class="sp-dc-icon" style="background:linear-gradient(135deg,#fef3c7,#fde68a);color:#d97706"><i class="bi bi-search"></i></div>
+                <div class="sp-dc-title">Buscar por Cédula</div>
+                <div class="sp-dc-desc">Consulta individual de estudiante</div>
+            </a>
+        </div>
+        <div class="col-6 col-md-4 col-lg">
+            <a th:href="@{/docente/informe/alumnos(tipo='TOTAL')}" class="sp-doc-card" style="border-color:#93c5fd">
+                <div class="sp-dc-icon" style="background:linear-gradient(135deg,#dbeafe,#bfdbfe);color:#2563eb"><i class="bi bi-bar-chart-fill"></i></div>
+                <div class="sp-dc-title">Informe Total</div>
+                <div class="sp-dc-desc">Todos los resultados globales</div>
+            </a>
+        </div>
+        <div class="col-6 col-md-4 col-lg">
+            <a th:href="@{/docente/informe/alumnos(tipo='UNICO')}" class="sp-doc-card" style="border-color:#c4b5fd">
+                <div class="sp-dc-icon" style="background:linear-gradient(135deg,#ede9fe,#ddd6fe);color:#7c3aed"><i class="bi bi-clipboard-data-fill"></i></div>
+                <div class="sp-dc-title">Informe Único</div>
+                <div class="sp-dc-desc">Resultados individuales por prueba</div>
+            </a>
+        </div>
+        <div class="col-6 col-md-4 col-lg">
+            <a th:href="@{/docente/informe/beneficios}" class="sp-doc-card" style="border-color:#5eead4">
+                <div class="sp-dc-icon" style="background:linear-gradient(135deg,#ccfbf1,#99f6e4);color:#0d9488"><i class="bi bi-award-fill"></i></div>
+                <div class="sp-dc-title">Informe Beneficios</div>
+                <div class="sp-dc-desc">Estudiantes con beneficio asignado</div>
+            </a>
+        </div>
+        <div class="col-6 col-md-4 col-lg">
+            <a th:href="@{/docente/resoluciones}" class="sp-doc-card" style="border-color:#fda4af">
+                <div class="sp-dc-icon" style="background:linear-gradient(135deg,#ffe4e6,#fecdd3);color:#e11d48"><i class="bi bi-file-earmark-ruled-fill"></i></div>
+                <div class="sp-dc-title">Resoluciones</div>
+                <div class="sp-dc-desc">Beneficios Tecnología e Ingeniería</div>
+            </a>
+        </div>
+    </div>
+
+    <!-- CARRERAS — para navegar a alumnos por carrera -->
+    <div class="sp-card">
+        <div class="sp-card-header">
+            <span><i class="bi bi-building-fill me-2"></i>Ver Estudiantes por Facultad</span>
+        </div>
+        <div class="sp-card-body">
+            <div class="row g-3">
+                <div th:each="f : ${facultades}" class="col-md-6 col-lg-4">
+                    <a th:href="@{/docente/alumnos/facultad/{id}(id=${f.id})}"
+                       class="d-flex align-items-center gap-3 p-3 sp-carrera-btn">
+                        <div style="width:42px;height:42px;border-radius:10px;background:rgba(249,115,22,.15);color:#f97316;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px">
+                            <i class="bi bi-mortarboard-fill"></i>
+                        </div>
+                        <div style="flex:1;min-width:0">
+                            <div style="font-weight:600;font-size:13px;color:#f97316" th:text="${f.nombre}">Carrera</div>
+                            <div style="font-size:11px;color:var(--c-text2)" th:text="'Código: ' + ${f.codigo}">Código</div>
+                        </div>
+                        <i class="bi bi-chevron-right" style="color:#f97316;flex-shrink:0"></i>
+                    </a>
+                </div>
+                <div th:if="${#lists.isEmpty(facultades)}" class="col-12">
+                    <div class="sp-empty-state py-3"><i class="bi bi-building-x"></i><p>Sin carreras disponibles</p></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</main>
+</div>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+<style>
+.sp-doc-card{display:flex;flex-direction:column;gap:8px;padding:18px;background:#fff;border:1.5px solid;border-radius:var(--sp-radius);text-decoration:none;color:var(--c-text);transition:all .2s;height:100%}
+.sp-doc-card:hover{transform:translateY(-3px);box-shadow:var(--sp-shadow-md);color:var(--c-text)}
+.sp-dc-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:4px}
+.sp-dc-title{font-weight:700;font-size:14px;color:#f97316}
+.sp-dc-desc{font-size:11px;color:var(--c-text2);line-height:1.4}
+.sp-carrera-btn{background:#fff;border:1.5px solid var(--sp-border-soft);border-radius:var(--sp-radius);text-decoration:none;transition:all .18s}
+.sp-carrera-btn:hover{background:rgba(249,115,22,.15);border-color:#f97316;transform:translateX(4px)}
+</style>
+</body>
+</html>

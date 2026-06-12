@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Sistema Saber Pro — UTS Bucaramanga</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&amp;family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&amp;display=swap" rel="stylesheet"/>
+    <link th:href="@{/css/saberpro.css}" rel="stylesheet"/>
+</head>
+<body class="sp-public-body">
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg sp-public-nav fixed-top">
+    <div class="container px-4">
+        <a class="navbar-brand sp-public-brand" th:href="@{/}">
+            <div class="sp-nav-icon"><i class="bi bi-mortarboard-fill"></i></div>
+            <div>
+                <div class="fw-700" style="font-family:var(--font-display);letter-spacing:.04em">SABER PRO</div>
+                <div class="sp-nav-subtitle">UTS Bucaramanga</div>
+            </div>
+        </a>
+        <div class="ms-auto d-flex align-items-center gap-3">
+            <a href="#roles" class="sp-btn-ghost d-none d-md-flex">Módulos</a>
+            <a href="#flujo" class="sp-btn-ghost d-none d-md-flex">Proceso</a>
+            <a th:href="@{/login}" class="btn sp-btn-primary">
+                <i class="bi bi-box-arrow-in-right me-2"></i>Ingresar
+            </a>
+        </div>
+    </div>
+</nav>
+
+<!-- HERO -->
+<section class="sp-hero">
+    <div class="sp-hero-grid"></div>
+    <div class="container position-relative py-5">
+        <div class="row align-items-center" style="min-height:calc(100vh - 64px)">
+            <div class="col-lg-7 py-5">
+                <div class="sp-hero-eyebrow">
+                    <span class="sp-eyebrow-dot"></span>
+                    Unidades Tecnológicas de Santander — Bucaramanga
+                </div>
+                <h1 class="sp-hero-title">
+                    Control integral<br/>de las pruebas
+                    <span class="sp-title-accent">Saber Pro</span>
+                </h1>
+                <p class="sp-hero-desc">
+                    Plataforma institucional para inscripciones, aprobaciones, resultados
+                    y beneficios académicos. Cuatro roles, un solo sistema.
+                </p>
+                <div class="sp-hero-actions">
+                    <a th:href="@{/login}" class="btn sp-btn-primary btn-lg">
+                        <i class="bi bi-box-arrow-in-right me-2"></i>Acceder al Sistema
+                    </a>
+                    <a href="#roles" class="btn sp-btn-outline btn-lg">
+                        <i class="bi bi-people me-2"></i>Ver Módulos
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-5 d-none d-lg-flex justify-content-center">
+                <div class="sp-hero-visual">
+                    <div class="sp-stat-card sp-stat-1">
+                        <i class="bi bi-people-fill sp-stat-icon"></i>
+                        <div class="sp-stat-val">34</div>
+                        <div class="sp-stat-lbl">Estudiantes</div>
+                    </div>
+                    <div class="sp-stat-card sp-stat-2">
+                        <i class="bi bi-award-fill sp-stat-icon"></i>
+                        <div class="sp-stat-val">Beneficios</div>
+                        <div class="sp-stat-lbl">Ing. y Tecnología</div>
+                    </div>
+                    <div class="sp-stat-card sp-stat-3">
+                        <i class="bi bi-shield-fill-check sp-stat-icon"></i>
+                        <div class="sp-stat-val">4 Roles</div>
+                        <div class="sp-stat-lbl">Acceso seguro</div>
+                    </div>
+                    <div class="sp-hero-center-icon">
+                        <i class="bi bi-mortarboard-fill"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- STATS BAR -->
+<section class="sp-stats-bar">
+    <div class="container">
+        <div class="row g-0">
+            <div class="col-6 col-md-3 sp-stat-item"><div class="sp-stat-num">4</div><div class="sp-stat-txt">Roles de acceso</div></div>
+            <div class="col-6 col-md-3 sp-stat-item"><div class="sp-stat-num">29</div><div class="sp-stat-txt">Programas UTS</div></div>
+            <div class="col-6 col-md-3 sp-stat-item"><div class="sp-stat-num">360°</div><div class="sp-stat-txt">Visibilidad resultados</div></div>
+            <div class="col-6 col-md-3 sp-stat-item"><div class="sp-stat-num">MongoDB</div><div class="sp-stat-txt">Base de datos</div></div>
+        </div>
+    </div>
+</section>
+
+<!-- ROLES -->
+<section class="sp-section" id="roles">
+    <div class="container">
+        <div class="sp-section-header text-center">
+            <p class="sp-section-eyebrow">Acceso diferenciado</p>
+            <h2 class="sp-section-title">Módulos del Sistema</h2>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-6 col-xl-3">
+                <div class="sp-role-card sp-role-admin">
+                    <div class="sp-role-icon"><i class="bi bi-shield-fill-check"></i></div>
+                    <h3 class="sp-role-title">Administrador</h3>
+                    <ul class="sp-role-list">
+                        <li><i class="bi bi-check2-circle"></i>CRUD Directores</li>
+                        <li><i class="bi bi-check2-circle"></i>CRUD Docentes</li>
+                        <li><i class="bi bi-check2-circle"></i>Gestión de Carreras</li>
+                        <li><i class="bi bi-check2-circle"></i>Resoluciones de Beneficios</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-md-6 col-xl-3">
+                <div class="sp-role-card sp-role-coord">
+                    <div class="sp-role-icon"><i class="bi bi-diagram-3-fill"></i></div>
+                    <h3 class="sp-role-title">Coordinación</h3>
+                    <ul class="sp-role-list">
+                        <li><i class="bi bi-check2-circle"></i>CRUD Estudiantes</li>
+                        <li><i class="bi bi-check2-circle"></i>Aprobar Saber Pro</li>
+                        <li><i class="bi bi-check2-circle"></i>Informe Total y Único</li>
+                        <li><i class="bi bi-check2-circle"></i>Informe de Beneficios</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-md-6 col-xl-3">
+                <div class="sp-role-card sp-role-docente">
+                    <div class="sp-role-icon"><i class="bi bi-person-video3"></i></div>
+                    <h3 class="sp-role-title">Docente</h3>
+                    <ul class="sp-role-list">
+                        <li><i class="bi bi-check2-circle"></i>Estudiantes por Carrera</li>
+                        <li><i class="bi bi-check2-circle"></i>Búsqueda por Cédula</li>
+                        <li><i class="bi bi-check2-circle"></i>Informe Total y Único</li>
+                        <li><i class="bi bi-check2-circle"></i>Consulta Resoluciones</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-md-6 col-xl-3">
+                <div class="sp-role-card sp-role-estudiante">
+                    <div class="sp-role-icon"><i class="bi bi-person-fill-check"></i></div>
+                    <h3 class="sp-role-title">Estudiante</h3>
+                    <ul class="sp-role-list">
+                        <li><i class="bi bi-check2-circle"></i>Identificación personal</li>
+                        <li><i class="bi bi-check2-circle"></i>Cargue de pago</li>
+                        <li><i class="bi bi-check2-circle"></i>Resultado Único</li>
+                        <li><i class="bi bi-check2-circle"></i>Resultados Total</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FLUJO -->
+<section class="sp-section sp-section-dark" id="flujo">
+    <div class="container">
+        <div class="sp-section-header text-center">
+            <p class="sp-section-eyebrow">Proceso institucional</p>
+            <h2 class="sp-section-title">Flujo del Proceso Saber Pro</h2>
+        </div>
+        <div class="sp-flow">
+            <div class="sp-flow-step"><div class="sp-flow-num">01</div><div class="sp-flow-icon"><i class="bi bi-person-plus-fill"></i></div><div class="sp-flow-title">Registro</div><div class="sp-flow-desc">Coordinación registra al estudiante</div></div>
+            <div class="sp-flow-arrow d-none d-md-block"><i class="bi bi-arrow-right-circle"></i></div>
+            <div class="sp-flow-step"><div class="sp-flow-num">02</div><div class="sp-flow-icon"><i class="bi bi-clipboard-check-fill"></i></div><div class="sp-flow-title">Aprobación</div><div class="sp-flow-desc">Coordinación verifica y aprueba</div></div>
+            <div class="sp-flow-arrow d-none d-md-block"><i class="bi bi-arrow-right-circle"></i></div>
+            <div class="sp-flow-step"><div class="sp-flow-num">03</div><div class="sp-flow-icon"><i class="bi bi-credit-card-fill"></i></div><div class="sp-flow-title">Pago</div><div class="sp-flow-desc">Estudiante carga comprobante</div></div>
+            <div class="sp-flow-arrow d-none d-md-block"><i class="bi bi-arrow-right-circle"></i></div>
+            <div class="sp-flow-step"><div class="sp-flow-num">04</div><div class="sp-flow-icon"><i class="bi bi-bar-chart-fill"></i></div><div class="sp-flow-title">Resultados</div><div class="sp-flow-desc">Registro y consulta de resultados</div></div>
+            <div class="sp-flow-arrow d-none d-md-block"><i class="bi bi-arrow-right-circle"></i></div>
+            <div class="sp-flow-step"><div class="sp-flow-num">05</div><div class="sp-flow-icon"><i class="bi bi-award-fill"></i></div><div class="sp-flow-title">Beneficios</div><div class="sp-flow-desc">Aplicación de resoluciones</div></div>
+        </div>
+    </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="sp-footer">
+    <div class="container text-center">
+        <div class="sp-footer-brand"><i class="bi bi-mortarboard-fill me-2" style="color:var(--c-accent)"></i>Sistema Saber Pro — UTS</div>
+        <p class="sp-footer-text">Unidades Tecnológicas de Santander — Bucaramanga, Colombia<br/>Gestión integral de Exámenes de Estado Saber Pro</p>
+        <p class="sp-footer-copy">© 2025 UTS — Todos los derechos reservados</p>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

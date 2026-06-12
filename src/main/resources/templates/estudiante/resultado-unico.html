@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Resultado Único')}"></head>
+<body class="sp-body">
+<div th:replace="~{fragments/layout :: sidebar}"></div>
+<div class="sp-main">
+<div th:replace="~{fragments/layout :: topbar}"></div>
+<main class="sp-content">
+
+    <div class="sp-page-header">
+        <div>
+            <h1 class="sp-page-title font-display"><i class="bi bi-clipboard-data-fill me-2"></i>Resultado Único Saber Pro</h1>
+            <p class="sp-page-subtitle">Puntaje individual de tu presentación del examen</p>
+        </div>
+        <div class="d-flex gap-2">
+            <button onclick="window.print()" class="btn sp-btn-outline btn-sm">
+                <i class="bi bi-printer-fill me-1"></i>Imprimir
+            </button>
+            <a th:href="@{/estudiante/dashboard}" class="btn sp-btn-outline"><i class="bi bi-arrow-left me-1"></i>Volver</a>
+        </div>
+    </div>
+
+    <!-- Sin resultado -->
+    <div th:if="${resultado == null}" class="sp-card p-5 text-center">
+        <i class="bi bi-clipboard-x-fill" style="font-size:3rem;color:var(--c-text2)"></i>
+        <h5 class="mt-3" style="color:#f97316">Resultado no disponible aún</h5>
+        <p class="text-muted" th:if="${alumno != null}">
+            <span th:text="${alumno.nombreCompleto}">Estudiante</span>, tu resultado será cargado por coordinación una vez se reciban los reportes del ICFES.
+        </p>
+        <p class="text-muted" th:if="${alumno == null}">Comunícate con coordinación para verificar tu registro.</p>
+    </div>
+
+    <div th:if="${resultado != null}">
+        <div class="row g-4">
+            <!-- Card puntaje global -->
+            <div class="col-md-4">
+                <div class="sp-resultado-card">
+                    <div class="sp-resultado-header text-center">
+                        <div class="sp-resultado-lbl">Puntaje Global</div>
+                        <div class="sp-resultado-global" th:text="${#numbers.formatDecimal(resultado.puntajeGlobal,1,0)}">0</div>
+                        <div class="sp-resultado-clas" th:text="${resultado.clasificacion}">nivel</div>
+                        <div class="mt-2" style="font-size:12px;opacity:.8">
+                            Período: <span th:text="${resultado.periodo}">2025-2</span>
+                        </div>
+                    </div>
+                    <div class="sp-card-body">
+                        <div class="text-center mb-3">
+                            <small class="text-muted">Estudiante</small>
+                            <div style="font-weight:700" th:text="${alumno.nombreCompleto}">-</div>
+                            <div style="font-size:12px;color:var(--c-text2)" th:text="${alumno.codigoEstudiante}">-</div>
+                        </div>
+                        <div class="text-center mb-3">
+                            <small class="text-muted">Módulo Específico</small>
+                            <div style="font-weight:600;font-size:13px" th:text="${resultado.moduloEspecificoNombre}">-</div>
+                            <div class="sp-score mt-1"
+                                 th:classappend="${resultado.clasificacion == 'SUPERIOR' ? ' sp-score-superior' :
+                                                  resultado.clasificacion == 'ALTO' ? ' sp-score-alto' :
+                                                  resultado.clasificacion == 'MEDIO' ? ' sp-score-medio' : ' sp-score-bajo'}"
+                                 th:text="${#numbers.formatDecimal(resultado.moduloEspecificoPuntaje,1,0)}">-</div>
+                        </div>
+                        <div class="text-center" th:if="${resultado.ingles != null}">
+                            <small class="text-muted">Nivel de Inglés</small>
+                            <div style="font-size:20px;font-weight:800;color:#f97316" th:text="${alumno.resultadoUnico?.observaciones?.contains('B2') ? 'B2' : alumno.resultadoUnico?.observaciones?.contains('B1') ? 'B1' : 'A2'}">-</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Módulos genéricos -->
+            <div class="col-md-8">
+                <div class="sp-card h-100">
+                    <div class="sp-card-header"><span><i class="bi bi-bar-chart-fill me-2"></i>Puntajes por Módulo</span></div>
+                    <div class="sp-card-body">
+                        <div th:each="mod : ${ {
+                                {'Comunicación Escrita', resultado.comunicacionEscrita},
+                                {'Razonamiento Cuantitativo', resultado.razonamientoCuantitativo},
+                                {'Lectura Crítica', resultado.lecturasCritica},
+                                {'Competencias Ciudadanas', resultado.competenciasCiudadanas},
+                                {'Inglés', resultado.ingles}
+                            } }">
+                            <div th:if="false"><!-- placeholder for iteration logic --></div>
+                        </div>
+
+                        <!-- Manual listing for clarity -->
+                        <div class="sp-modulo-row">
+                            <div style="min-width:200px;font-size:13px">Comunicación Escrita</div>
+                            <div class="sp-modulo-bar-bg"><div class="sp-modulo-bar" th:style="'width:' + ${(resultado.comunicacionEscrita / 300.0) * 100} + '%'"></div></div>
+                            <div class="sp-score ms-3" th:classappend="${resultado.comunicacionEscrita >= 170 ? ' sp-score-superior' : resultado.comunicacionEscrita >= 145 ? ' sp-score-alto' : resultado.comunicacionEscrita >= 120 ? ' sp-score-medio' : ' sp-score-bajo'}"
+                                 th:text="${#numbers.formatDecimal(resultado.comunicacionEscrita,1,0)}">0</div>
+                        </div>
+                        <div class="sp-modulo-row">
+                            <div style="min-width:200px;font-size:13px">Razonamiento Cuantitativo</div>
+                            <div class="sp-modulo-bar-bg"><div class="sp-modulo-bar" th:style="'width:' + ${(resultado.razonamientoCuantitativo / 300.0) * 100} + '%'"></div></div>
+                            <div class="sp-score ms-3" th:classappend="${resultado.razonamientoCuantitativo >= 170 ? ' sp-score-superior' : resultado.razonamientoCuantitativo >= 145 ? ' sp-score-alto' : resultado.razonamientoCuantitativo >= 120 ? ' sp-score-medio' : ' sp-score-bajo'}"
+                                 th:text="${#numbers.formatDecimal(resultado.razonamientoCuantitativo,1,0)}">0</div>
+                        </div>
+                        <div class="sp-modulo-row">
+                            <div style="min-width:200px;font-size:13px">Lectura Crítica</div>
+                            <div class="sp-modulo-bar-bg"><div class="sp-modulo-bar" th:style="'width:' + ${(resultado.lecturasCritica / 300.0) * 100} + '%'"></div></div>
+                            <div class="sp-score ms-3" th:classappend="${resultado.lecturasCritica >= 170 ? ' sp-score-superior' : resultado.lecturasCritica >= 145 ? ' sp-score-alto' : resultado.lecturasCritica >= 120 ? ' sp-score-medio' : ' sp-score-bajo'}"
+                                 th:text="${#numbers.formatDecimal(resultado.lecturasCritica,1,0)}">0</div>
+                        </div>
+                        <div class="sp-modulo-row">
+                            <div style="min-width:200px;font-size:13px">Competencias Ciudadanas</div>
+                            <div class="sp-modulo-bar-bg"><div class="sp-modulo-bar" th:style="'width:' + ${(resultado.competenciasCiudadanas / 300.0) * 100} + '%'"></div></div>
+                            <div class="sp-score ms-3" th:classappend="${resultado.competenciasCiudadanas >= 170 ? ' sp-score-superior' : resultado.competenciasCiudadanas >= 145 ? ' sp-score-alto' : resultado.competenciasCiudadanas >= 120 ? ' sp-score-medio' : ' sp-score-bajo'}"
+                                 th:text="${#numbers.formatDecimal(resultado.competenciasCiudadanas,1,0)}">0</div>
+                        </div>
+                        <div class="sp-modulo-row">
+                            <div style="min-width:200px;font-size:13px">Inglés</div>
+                            <div class="sp-modulo-bar-bg"><div class="sp-modulo-bar" th:style="'width:' + ${(resultado.ingles / 300.0) * 100} + '%'"></div></div>
+                            <div class="sp-score ms-3" th:classappend="${resultado.ingles >= 170 ? ' sp-score-superior' : resultado.ingles >= 145 ? ' sp-score-alto' : resultado.ingles >= 120 ? ' sp-score-medio' : ' sp-score-bajo'}"
+                                 th:text="${#numbers.formatDecimal(resultado.ingles,1,0)}">0</div>
+                        </div>
+                        <div class="sp-modulo-row" style="border-top:2px solid #f97316;margin-top:8px;padding-top:12px">
+                            <div style="min-width:200px;font-size:13px;font-weight:700" th:text="${resultado.moduloEspecificoNombre}">Módulo Específico</div>
+                            <div class="sp-modulo-bar-bg"><div class="sp-modulo-bar" style="background:#7c3aed" th:style="'width:' + ${(resultado.moduloEspecificoPuntaje / 300.0) * 100} + '%;background:#7c3aed'"></div></div>
+                            <div class="sp-score ms-3 sp-score-alto" th:text="${#numbers.formatDecimal(resultado.moduloEspecificoPuntaje,1,0)}">0</div>
+                        </div>
+
+                        <div th:if="${alumno.tieneBeneficio}" class="mt-4 p-3" style="background:rgba(249,115,22,.15);border-radius:8px">
+                            <i class="bi bi-award-fill text-success me-2"></i>
+                            <strong style="color:#f97316">¡Felicitaciones!</strong>
+                            Tu puntaje te hace acreedor al beneficio: <strong th:text="${alumno.tipoBeneficio}">tipo</strong>.
+                            <a th:href="@{/estudiante/resoluciones}" class="ms-2 small">Ver resolución →</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</main>
+</div>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+<style>@media print{.sp-sidebar,.sp-topbar,.sp-page-header .d-flex{display:none!important}.sp-main{margin-left:0!important}@page{size:A4;margin:1.5cm}}</style>
+</body>
+</html>
